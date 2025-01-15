@@ -2,6 +2,7 @@ package game2048;
 
 import java.util.Formatter;
 import java.util.Observable;
+import java.util.ArrayList;
 
 
 /** The state of a game of 2048.
@@ -162,6 +163,19 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int flag=0;
+        for(int i=0 ; i<b.size() ; i++)
+        {
+            for(int j=0 ; j<b.size() ; j++)
+            {
+                if(b.tile(i , j).value() == MAX_PIECE)
+                {
+                    flag=1;
+                    break;
+                }
+            }
+        }
+        if (flag == 1) return true;
         return false;
     }
 
@@ -173,7 +187,48 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if(Model.emptySpaceExists(b))
+        {
+            return true;
+        }
+        else if(Model.existSameValue(b))
+        {
+            return true;
+        }
         return false;
+    }
+
+    public static boolean existSameValue(Board b)
+    {
+        int flag=0;
+        for(int i=0 ; i<b.size(); i++)
+        {
+            for(int j=0 ; j<b.size() ; j++)
+            {
+                for(Tile nb : Model.theAdacence(b , i ,j)) {
+                    if (b.tile(i, j).value() == nb.value()) {
+                        flag=1;
+                    }
+                }
+            }
+        }
+        if(flag == 1) return true;
+        return false;
+    }
+
+    public static ArrayList<Tile> theAdacence(Board b , int i , int j)
+    {
+        ArrayList<Tile> Adacence = new ArrayList<Tile>();
+        for(int k=i-1 ; k<=i+1 ; k++)
+        {
+            for(int l=j-1 ; l<=j+1 ; l++)
+            {
+                if((k<0 || k>= b.size()) || (j<0 || j>= b.size()))
+                    continue;
+                Adacence.add(b.tile(k , l));
+            }
+        }
+        return Adacence;
     }
 
 
