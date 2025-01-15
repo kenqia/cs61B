@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @kenqia TODO: YOUR NAME HERE
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -33,7 +33,7 @@ public class Model extends Observable {
         gameOver = false;
     }
 
-    /** A new 2048 game where RAWVALUES contain the values of the tiles
+    /** A new 2048 game where RAVALUES contain the values of the tiles
      * (0 if null). VALUES is indexed by (row, col) with (0, 0) corresponding
      * to the bottom-left corner. Used for testing purposes. */
     public Model(int[][] rawValues, int score, int maxScore, boolean gameOver) {
@@ -138,6 +138,20 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int flag=1;
+        for(int i=0 ; i < b.size() ; i++)
+        {
+            for(int j=0 ; j < b.size() ; j++)
+            {
+                if(b.tile(i , j) == null)
+                {
+                    flag = 0;
+                    break;
+                }
+
+            }
+        }
+        if(flag == 1) return true;
         return false;
     }
 

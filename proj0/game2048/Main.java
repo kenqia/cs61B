@@ -9,12 +9,6 @@ import ucb.util.CommandArgs;
  */
 public class Main {
 
-
-
-
-
-
-    
     /** Number of squares on the side of a board. */
     static final int BOARD_SIZE = 4;
     /** Probability of choosing 2 as random tile (as opposed to 4). */
@@ -32,6 +26,7 @@ public class Main {
                                + "[ --log=LOG_FILE ]");
             System.exit(1);
         }
+
         Random gen = new Random();
         if (options.contains("--seed")) {
             gen.setSeed(options.getLong("--seed"));
