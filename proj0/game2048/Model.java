@@ -34,7 +34,7 @@ public class Model extends Observable {
         gameOver = false;
     }
 
-    /** A new 2048 game where RAVALUES contain the values of the tiles
+    /** A new 2048 game where RAWVALUES contain the values of the tiles
      * (0 if null). VALUES is indexed by (row, col) with (0, 0) corresponding
      * to the bottom-left corner. Used for testing purposes. */
     public Model(int[][] rawValues, int score, int maxScore, boolean gameOver) {
@@ -110,6 +110,11 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
+        if(side == Side.NORTH)
+        {
+            changed=letMove();
+        }
+
 
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
@@ -120,6 +125,46 @@ public class Model extends Observable {
             setChanged();
         }
         return changed;
+    }
+
+    public boolean letMove ()
+    {
+        for(int i=0 ; i<board.size() ; i++)
+        {
+            for (int j=board.size() -1 ; j>=0 ; j--)
+            {
+                if(board.tile(i , j)==null)
+                    continue;
+                int limit = limitRange(i ,j);
+                if(board.move( i , limit ,board.tile(i, j)))
+                {
+                    score+=board.tile(i , limit).value();
+
+                }
+            }
+        }
+        return true;
+    }
+
+    public int limitRange(int i , int j)
+    {
+        if(j == board.size() -1 )
+        {
+            return  board.size() -1;
+        }
+        else
+        {
+            for(int k =j+1 ; k<board.size(); k++)
+            {
+                if(board.tile(i, k)==null)
+                    continue;
+                if(board.tile(i , k).value() != board.tile(i , j).value())
+                {
+                    return k-1;
+                }
+            }
+            return board.size()-1;
+        }
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -139,14 +184,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
-        int flag=1;
+        int flag=0;
         for(int i=0 ; i < b.size() ; i++)
         {
             for(int j=0 ; j < b.size() ; j++)
             {
                 if(b.tile(i , j) == null)
                 {
-                    flag = 0;
+                    flag = 1;
                     break;
                 }
 
@@ -168,7 +213,9 @@ public class Model extends Observable {
         {
             for(int j=0 ; j<b.size() ; j++)
             {
-                if(b.tile(i , j).value() == MAX_PIECE)
+                if(b.tile(i , j)== null)
+                    continue;
+                else if(b.tile(i , j).value() == MAX_PIECE)
                 {
                     flag=1;
                     break;
@@ -187,11 +234,11 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
-        if(Model.emptySpaceExists(b))
+        if(emptySpaceExists(b))
         {
             return true;
         }
-        else if(Model.existSameValue(b))
+        else if(existSameValue(b))
         {
             return true;
         }
@@ -206,7 +253,9 @@ public class Model extends Observable {
             for(int j=0 ; j<b.size() ; j++)
             {
                 for(Tile nb : Model.theAdacence(b , i ,j)) {
-                    if (b.tile(i, j).value() == nb.value()) {
+                    if (nb==null || b.tile(i , j) == null)
+                        continue;
+                    else if (b.tile(i, j).value() == nb.value()) {
                         flag=1;
                     }
                 }
@@ -223,7 +272,11 @@ public class Model extends Observable {
         {
             for(int l=j-1 ; l<=j+1 ; l++)
             {
-                if((k<0 || k>= b.size()) || (j<0 || j>= b.size()))
+                if(k<0 || k>= b.size())
+                    continue;
+                if(k==0 && l==0)
+                    continue;
+                if(l<0 || l>= b.size())
                     continue;
                 Adacence.add(b.tile(k , l));
             }
