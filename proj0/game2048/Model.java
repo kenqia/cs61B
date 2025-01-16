@@ -110,43 +110,44 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-        if(side == Side.NORTH)
-        {
-            changed=letMove();
-        }
-
-
+        board.setViewingPerspective(side);
+        changed=letMove();
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
-
-    public boolean letMove ()
+    private boolean letMove ()
     {
+        int cnt = 0;
         for(int i=0 ; i<board.size() ; i++)
         {
+            int flag = 0;
             for (int j=board.size() -1 ; j>=0 ; j--)
             {
                 if(board.tile(i , j)==null)
                     continue;
-                int limit = limitRange(i ,j);
+                int limit = limitRange(i ,j , flag);
+                if(limit != j) cnt = 1;
                 if(board.move( i , limit ,board.tile(i, j)))
                 {
                     score+=board.tile(i , limit).value();
-
+                    if(flag == 0) flag = 1;
+                    continue;
                 }
+                if(flag == 1) flag = 0;
             }
         }
-        return true;
+        if(cnt == 1) return true;
+        else return  false;
     }
 
-    public int limitRange(int i , int j)
+    private int limitRange(int i , int j , int flag)
     {
         if(j == board.size() -1 )
         {
@@ -154,13 +155,25 @@ public class Model extends Observable {
         }
         else
         {
-            for(int k =j+1 ; k<board.size(); k++)
+            for(int k = j + 1 ; k < board.size() ; k++)
             {
                 if(board.tile(i, k)==null)
                     continue;
                 if(board.tile(i , k).value() != board.tile(i , j).value())
                 {
-                    return k-1;
+                        return k - 1;
+                }
+                else
+                {
+                    if (flag == 0)
+                    {
+                     return k;
+                    }
+                    else
+                    {
+                        return k-1;
+                    }
+
                 }
             }
             return board.size()-1;
@@ -245,7 +258,7 @@ public class Model extends Observable {
         return false;
     }
 
-    public static boolean existSameValue(Board b)
+    private static boolean existSameValue(Board b)
     {
         int flag=0;
         for(int i=0 ; i<b.size(); i++)
@@ -265,19 +278,17 @@ public class Model extends Observable {
         return false;
     }
 
-    public static ArrayList<Tile> theAdacence(Board b , int i , int j)
+    private static ArrayList<Tile> theAdacence(Board b , int i , int j)
     {
         ArrayList<Tile> Adacence = new ArrayList<Tile>();
         for(int k=i-1 ; k<=i+1 ; k++)
         {
             for(int l=j-1 ; l<=j+1 ; l++)
             {
-                if(k<0 || k>= b.size())
-                    continue;
-                if(k==0 && l==0)
-                    continue;
-                if(l<0 || l>= b.size())
-                    continue;
+                if ( (k + l - j - i) % 2 == 0) continue;
+                if(k<0 || k>= b.size()) continue;
+                if(k==0 && l==0) continue;
+                if(l<0 || l>= b.size()) continue;
                 Adacence.add(b.tile(k , l));
             }
         }
