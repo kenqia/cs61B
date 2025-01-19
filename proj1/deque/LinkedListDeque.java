@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
+public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
 
     public LinkedNode<Item> sentinel = new LinkedNode<Item>();
     private int size = 0;
@@ -19,6 +19,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         return new theLinked();
     }
 
+    @Override
     public void addFirst(Item L) {
         LinkedNode<Item> newOne = new LinkedNode<Item>();
         newOne.L = L;
@@ -29,6 +30,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         size++;
     }
 
+    @Override
     public void addLast(Item L) {
         LinkedNode<Item> newOne = new LinkedNode<Item>();
         newOne.L = L;
@@ -39,14 +41,12 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         size++;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         LinkedNode<Item> ptr = sentinel.next;
         while (ptr != sentinel) {
@@ -56,6 +56,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         System.out.println();
     }
 
+    @Override
     public Item removeFirst() {
         if (size == 0) return null;
         LinkedNode<Item> saving = sentinel.next;
@@ -65,6 +66,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         return saving.L;
     }
 
+    @Override
     public Item removeLast() {
         if (size == 0) return null;
         LinkedNode<Item> saving = sentinel.front;
@@ -74,6 +76,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         return saving.L;
     }
 
+    @Override
     public Item get(int index) {
         LinkedNode<Item> search = sentinel;
         for (int i = 0; i <= index; i++) {
@@ -83,7 +86,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
         return search.L;
     }
 
-
+    @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o.getClass() != LinkedListDeque.class) return false;
