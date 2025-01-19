@@ -18,10 +18,33 @@ public class TimeAList {
     }
 
     public static void main(String[] args) {
-        timeAListConstruction();
+        int[] number = {1000 , 2000 , 4000 , 8000 , 16000 , 32000 , 64000 , 128000};
+        AList <Integer> Ns = new AList<Integer>() ;
+        AList <Double> times = new AList<Double>();
+        AList <Integer> opCounts = new AList<Integer>();
+        for(int cnt : number)
+        {
+            Ns.addLast(cnt);
+            opCounts.addLast(cnt);
+        }
+        timeAListConstruction(Ns , times);
+        TimeAList.printTimingTable( Ns , times , opCounts);
+
     }
 
-    public static void timeAListConstruction() {
-        // TODO: YOUR CODE HERE
+    public static void timeAListConstruction(AList<Integer> Ns, AList<Double> times) {
+        for ( int i = 0 ; i < Ns.size() ; i ++)
+        {
+            AList<Integer>  Now = new AList<Integer>();
+            double time;
+            Stopwatch ee = new Stopwatch();
+            for ( int j = 0 ; j < Ns.get(i) ; j ++)
+            {
+                Now.addLast(null);
+            }
+            time = ee.elapsedTime();
+            times.addLast(time);
+        }
     }
 }
+
