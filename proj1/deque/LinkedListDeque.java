@@ -2,9 +2,9 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
-    public LinkedNode<Item> sentinel = new LinkedNode<Item>();
+    private LinkedNode<T> sentinel = new LinkedNode<T>();
     private int size = 0;
 
     public LinkedListDeque() {
@@ -15,13 +15,13 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Iterator<Item> iterator() {
+    public Iterator<T> iterator() {
         return new theLinked();
     }
 
     @Override
-    public void addFirst(Item L) {
-        LinkedNode<Item> newOne = new LinkedNode<Item>();
+    public void addFirst(T L) {
+        LinkedNode<T> newOne = new LinkedNode<T>();
         newOne.L = L;
         newOne.next = sentinel.next;
         newOne.front = sentinel;
@@ -31,8 +31,8 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public void addLast(Item L) {
-        LinkedNode<Item> newOne = new LinkedNode<Item>();
+    public void addLast(T L) {
+        LinkedNode<T> newOne = new LinkedNode<T>();
         newOne.L = L;
         newOne.next = sentinel;
         newOne.front = sentinel.front;
@@ -48,7 +48,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
 
     @Override
     public void printDeque() {
-        LinkedNode<Item> ptr = sentinel.next;
+        LinkedNode<T> ptr = sentinel.next;
         while (ptr != sentinel) {
             System.out.print(ptr.L + "");
             ptr = ptr.next;
@@ -57,9 +57,9 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item removeFirst() {
+    public T removeFirst() {
         if (size == 0) return null;
-        LinkedNode<Item> saving = sentinel.next;
+        LinkedNode<T> saving = sentinel.next;
         sentinel.next = saving.next;
         saving.next.front = sentinel;
         size--;
@@ -67,9 +67,9 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item removeLast() {
+    public T removeLast() {
         if (size == 0) return null;
-        LinkedNode<Item> saving = sentinel.front;
+        LinkedNode<T> saving = sentinel.front;
         sentinel.front = saving.front;
         saving.front.next = sentinel;
         size--;
@@ -77,8 +77,8 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item get(int index) {
-        LinkedNode<Item> search = sentinel;
+    public T get(int index) {
+        LinkedNode<T> search = sentinel;
         for (int i = 0; i <= index; i++) {
             search = search.next;
             if (search == sentinel) return null;
@@ -92,13 +92,13 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         if (o.getClass() != LinkedListDeque.class) return false;
 
         for (int i = 0; i < size; i++) {
-            if (!this.get(i).equals(((LinkedListDeque<Item>) o).get(i))) return false;
+            if (!this.get(i).equals(((LinkedListDeque<T>) o).get(i))) return false;
         }
         return true;
     }
 
-    private class theLinked implements Iterator<Item> {
-        public LinkedNode<Item> current;
+    private class theLinked implements Iterator<T> {
+        public LinkedNode<T> current;
 
         public theLinked() {
             this.current = sentinel.next;
@@ -111,19 +111,18 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         }
 
         @Override
-        public Item next() {
-            Item ONE = current.L;
+        public T next() {
+            T ONE = current.L;
             current = current.next;
             return ONE;
         }
     }
 
-    public class LinkedNode<Item> {
-        Item L = null;
+    public class LinkedNode<T> {
+        T L = null;
         private LinkedNode front = null;
         private LinkedNode next = null;
 
     }
-
 
 }

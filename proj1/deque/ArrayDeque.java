@@ -4,18 +4,18 @@ import java.io.ObjectStreamException;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
-    Item[] items;
-    int size = 0;
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
+    private T[] items;
+    private int size = 0;
 
     public ArrayDeque() {
-        this.items = (Item[]) new Object[8];
+        this.items = (T[]) new Object[8];
         this.size = 0;
     }
 
     @Override
-    public void addFirst(Item L) {
-        Item[] newOne = (Item[]) new Object[size + 1];
+    public void addFirst(T L) {
+        T[] newOne = (T[]) new Object[size + 1];
         newOne[0] = L;
         System.arraycopy(items, 0, newOne, 1, size);
         size++;
@@ -23,8 +23,8 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public void addLast(Item L) {
-        Item[] newOne = (Item[]) new Object[size + 1];
+    public void addLast(T L) {
+        T[] newOne = (T[]) new Object[size + 1];
         newOne[size] = L;
         System.arraycopy(items, 0, newOne, 0, size);
         size++;
@@ -45,9 +45,9 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item removeFirst() {
-        Item[] newOne = (Item[]) new Object[size - 1];
-        Item saving = items[0];
+    public T removeFirst() {
+        T[] newOne = (T[]) new Object[size - 1];
+        T saving = items[0];
         System.arraycopy(items, 1, newOne, 0, size - 1);
         size--;
         items = newOne;
@@ -55,9 +55,9 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item removeLast() {
-        Item[] newOne = (Item[]) new Object[size - 1];
-        Item saving = items[size - 1];
+    public T removeLast() {
+        T[] newOne = (T[]) new Object[size - 1];
+        T saving = items[size - 1];
         System.arraycopy(items, 0, newOne, 0, size - 1);
         size--;
         items = newOne;
@@ -65,13 +65,13 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item get(int index) {
+    public T get(int index) {
         if (index >= size) return null;
         return items[index];
     }
 
     @Override
-    public Iterator<Item> iterator() {
+    public Iterator<T> iterator() {
         return new Arrayee();
     }
 
@@ -81,12 +81,12 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
         if (o.getClass() != ArrayDeque.class) return false;
 
         for (int i = 0; i < size; i++) {
-            if (!this.get(i).equals(((ArrayDeque<Item>) o).get(i))) return false;
+            if (!this.get(i).equals(((ArrayDeque<T>) o).get(i))) return false;
         }
         return true;
     }
 
-    public class Arrayee implements Iterator<Item> {
+    public class Arrayee implements Iterator<T> {
         int e;
 
         public Arrayee() {
@@ -100,8 +100,8 @@ public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
         }
 
         @Override
-        public Item next() {
-            Item one = items[e];
+        public T next() {
+            T one = items[e];
             e++;
             return one;
         }
