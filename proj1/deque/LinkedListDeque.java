@@ -2,16 +2,21 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Item> implements List<Item> {
+public class LinkedListDeque<Item> implements Iterable<Item> ,Deque<Item>{
 
+    public LinkedNode<Item> sentinel = new LinkedNode<Item>();
     private int size = 0;
-    private LinkedNode<Item> sentinel = new LinkedNode<Item>();
 
     public LinkedListDeque() {
 
         sentinel.front = sentinel;
         sentinel.next = sentinel;
 
+    }
+
+    @Override
+    public Iterator<Item> iterator() {
+        return new theLinked();
     }
 
     public void addFirst(Item L) {
@@ -77,23 +82,44 @@ public class LinkedListDeque<Item> implements List<Item> {
         }
         return search.L;
     }
-    public Item getRecursive(int index)
-    {
-        return null;
-    }
 
-    public Iterator<Item> interator() {
-        return null;
-    }
 
     public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o.getClass() != LinkedListDeque.class) return false;
+
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(((LinkedListDeque<Item>) o).get(i))) return false;
+        }
         return true;
     }
 
-    public static class LinkedNode<Item> {
+    private class theLinked implements Iterator<Item> {
+        public LinkedNode<Item> current;
+
+        public theLinked() {
+            this.current = sentinel.next;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (current == sentinel) return false;
+            return true;
+        }
+
+        @Override
+        public Item next() {
+            Item ONE = current.L;
+            current = current.next;
+            return ONE;
+        }
+    }
+
+    public class LinkedNode<Item> {
         Item L = null;
         private LinkedNode front = null;
         private LinkedNode next = null;
+
     }
 
 

@@ -4,13 +4,13 @@ import java.io.ObjectStreamException;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ArrayDeque<Item> implements List<Item> {
+public class ArrayDeque<Item> implements Iterable<Item>{
     Item[] items;
     int size = 0;
 
     public ArrayDeque() {
         this.items = (Item[])new Object[8];
-        this.size = 8;
+        this.size = 0;
     }
 
     public void addFirst(Item L) {
@@ -72,12 +72,39 @@ public class ArrayDeque<Item> implements List<Item> {
         return items[index];
     }
 
+    @Override
+    public Iterator<Item> iterator(){
+        return new Arrayee();
+    }
 
-    public Iterator<Item> interator(){
-        return null;
+    public class Arrayee implements Iterator<Item>{
+        int e;
+
+        public Arrayee(){
+            e = 0;
+        }
+
+        @Override
+        public boolean hasNext(){
+         if(e < size ) return false;
+         return true;
+        }
+
+        @Override
+        public Item next(){
+            Item one = items[e];
+            e++;
+            return  one;
+        }
     }
 
     public boolean equals(Object o){
+        if (o == null) return false;
+        if (o.getClass() != ArrayDeque.class) return false;
+
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(((ArrayDeque<Item>) o).get(i))) return false;
+        }
         return true;
     }
 
