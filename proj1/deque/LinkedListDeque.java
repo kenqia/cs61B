@@ -48,10 +48,16 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public void printDeque() {
+        int flag = 0;
         LinkedNode<T> ptr = sentinel.next;
         while (ptr != sentinel) {
-            System.out.print(ptr.L + "");
-            ptr = ptr.next;
+            if (flag == 0) {
+                flag = 1;
+                System.out.print(ptr.L);
+            } else {
+                System.out.print(" " + ptr.L);
+                ptr = ptr.next;
+            }
         }
         System.out.println();
     }
@@ -120,8 +126,8 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     public class LinkedNode<T> {
         T L = null;
-        private LinkedNode front = null;
-        private LinkedNode next = null;
+        private LinkedNode<T> front = null;
+        private LinkedNode<T> next = null;
 
     }
 

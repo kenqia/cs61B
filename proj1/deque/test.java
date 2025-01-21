@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 public class test {
     @Test
     public void test(){
-        ArrayDeque<Integer> L = new ArrayDeque<>();
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
 
         int N = 20;
         for (int i = 0; i < N; i += 1) {

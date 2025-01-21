@@ -38,15 +38,21 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public void printDeque() {
+        int flag = 0;
         for (int i = 0; i < size; i++) {
-            System.out.print(items[i]);
+            if (flag == 0){
+                System.out.print(items[i]);
+                flag = 1;
+            }else{
+                System.out.print(" " + items[i]);
+            }
         }
         System.out.println();
     }
 
     @Override
     public T removeFirst() {
-        T[] newOne = (T[]) new Object[size - 1];
+        T[] newOne = ( T[] ) new Object[size - 1];
         T saving = items[0];
         System.arraycopy(items, 1, newOne, 0, size - 1);
         size--;
@@ -95,8 +101,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
         @Override
         public boolean hasNext() {
-            if (e < size) return false;
-            return true;
+            if(e < size) return true;
+            return false;
         }
 
         @Override
