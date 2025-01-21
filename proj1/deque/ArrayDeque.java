@@ -1,7 +1,5 @@
 package deque;
 
-import java.io.ObjectStreamException;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
@@ -40,10 +38,10 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     public void printDeque() {
         int flag = 0;
         for (int i = 0; i < size; i++) {
-            if (flag == 0){
+            if (flag == 0) {
                 System.out.print(items[i]);
                 flag = 1;
-            }else{
+            } else {
                 System.out.print(" " + items[i]);
             }
         }
@@ -52,7 +50,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T removeFirst() {
-        T[] newOne = ( T[] ) new Object[size - 1];
+        T[] newOne = (T[]) new Object[size - 1];
         T saving = items[0];
         System.arraycopy(items, 1, newOne, 0, size - 1);
         size--;
@@ -72,7 +70,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T get(int index) {
-        if (index >= size) return null;
+        if (index >= size || index < 0) return null;
         return items[index];
     }
 
@@ -84,7 +82,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (o.getClass() != ArrayDeque.class) return false;
+        else if (o.getClass() != ArrayDeque.class) return false;
 
         for (int i = 0; i < size; i++) {
             if (!this.get(i).equals(((ArrayDeque<T>) o).get(i))) return false;
@@ -92,7 +90,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         return true;
     }
 
-    public class Arrayee implements Iterator<T> {
+    private class Arrayee implements Iterator<T> {
         int e;
 
         public Arrayee() {
@@ -101,7 +99,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
         @Override
         public boolean hasNext() {
-            if(e < size) return true;
+            if (e < size) return true;
             return false;
         }
 

@@ -56,8 +56,8 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
                 System.out.print(ptr.L);
             } else {
                 System.out.print(" " + ptr.L);
-                ptr = ptr.next;
             }
+            ptr = ptr.next;
         }
         System.out.println();
     }
@@ -84,12 +84,14 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T get(int index) {
-        LinkedNode<T> search = sentinel;
-        for (int i = 0; i <= index; i++) {
-            search = search.next;
-            if (search == sentinel) return null;
+        if (index < 0 || index > size - 1) return null;
+        else {
+            LinkedNode<T> search = sentinel;
+            for (int i = 0; i <= index; i++) {
+                search = search.next;
+            }
+            return search.L;
         }
-        return search.L;
     }
 
     @Override
@@ -112,8 +114,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
         @Override
         public boolean hasNext() {
-            if (current == sentinel) return false;
-            return true;
+           return current != sentinel;
         }
 
         @Override
