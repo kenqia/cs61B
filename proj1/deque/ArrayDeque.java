@@ -50,6 +50,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T removeFirst() {
+        if ( size == 0 ) return null;
         T[] newOne = (T[]) new Object[size - 1];
         T saving = items[0];
         System.arraycopy(items, 1, newOne, 0, size - 1);
@@ -60,6 +61,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T removeLast() {
+        if (size == 0) return null;
         T[] newOne = (T[]) new Object[size - 1];
         T saving = items[size - 1];
         System.arraycopy(items, 0, newOne, 0, size - 1);
