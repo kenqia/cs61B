@@ -82,17 +82,17 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         return saving.L;
     }
 
+
     @Override
     public T get(int index) {
-        if (index < 0 || index > size - 1) return null;
-        else {
-            LinkedNode<T> search = sentinel;
-            for (int i = 0; i <= index; i++) {
-                search = search.next;
-            }
-            return search.L;
+        if (index < 0 || index >= size) return null;  // 允许从0到size-1
+        LinkedNode<T> search = sentinel.next;
+        for (int i = 0; i < index; i++) {  // 遍历直到目标节点
+            search = search.next;
         }
+        return search.L;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -129,7 +129,5 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         T L = null;
         private LinkedNode<T> front = null;
         private LinkedNode<T> next = null;
-
     }
-
 }
