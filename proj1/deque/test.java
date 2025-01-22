@@ -30,8 +30,10 @@ public class test {
             } else if (operationNumber == 4 ){
                 L.printDeque();
             } else if (operationNumber == 5) {
-                int randVal = StdRandom.uniform(0 , 100);
+                int randVal = StdRandom.uniform(0 , L.size() + 1);
+                System.out.println("111111111");
                 System.out.println(L.get(randVal));
+                System.out.println(L.getRecursive(randVal));
 
             }
         }
