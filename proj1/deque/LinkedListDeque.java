@@ -99,7 +99,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     private T getRecursiveHelper(int a , LinkedNode<T> node){
         if (a == 0) return node.L;
-        return getRecursiveHelper(a - 1 , sentinel.next);
+        return getRecursiveHelper(a - 1 , node.next);
     }
 
 

@@ -16,20 +16,20 @@ public class test {
                 int randVal = StdRandom.uniform(0, 100);
                 L.addLast(randVal);
                 System.out.println("addLast(" + randVal + ")");
-            } else if (operationNumber == 1) {
+            } else if (operationNumber == -4 ) {
                 // size
                 int size = L.size();
                 System.out.println("size: " + size);
-            } else if (operationNumber == 2) {   // addfirst
+            } else if (operationNumber == 2 || operationNumber == 1) {   // addfirst
                 int randVal = StdRandom.uniform(0, 100);
                 L.addFirst(randVal);
                 System.out.println("addFirst(" + randVal + ")");
-            } else if (operationNumber == 3){
+            } else if (operationNumber == -2 ){
                 L.removeFirst();
                 System.out.println("removeFirst");
-            } else if (operationNumber == 4 ){
+            } else if (operationNumber == -1 ){
                 L.printDeque();
-            } else if (operationNumber == 5) {
+            } else if (operationNumber == 5 || operationNumber == 3 || operationNumber == 4) {
                 int randVal = StdRandom.uniform(0 , L.size() + 1);
                 System.out.println("111111111");
                 System.out.println(L.get(randVal));
