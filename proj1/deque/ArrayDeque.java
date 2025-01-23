@@ -13,20 +13,17 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public void addFirst(T L) {
-        T[] newOne = (T[]) new Object[size + 1];
-        newOne[0] = L;
-        System.arraycopy(items, 0, newOne, 1, size);
+        if (size + 1 >=items.length ) resize(2 * size );
+        System.arraycopy(items, 0, items, 1, size);
         size++;
-        items = newOne;
+        items[0] = L;
     }
 
     @Override
     public void addLast(T L) {
-        T[] newOne = (T[]) new Object[size + 1];
-        newOne[size] = L;
-        System.arraycopy(items, 0, newOne, 0, size);
-        size++;
-        items = newOne;
+        if (size + 1 >=items.length ) resize(2 * size );
+        items[size] = L;
+        size++ ;
     }
 
     @Override
@@ -51,23 +48,23 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     @Override
     public T removeFirst() {
         if ( size == 0 ) return null;
-        T[] newOne = (T[]) new Object[size - 1];
         T saving = items[0];
-        System.arraycopy(items, 1, newOne, 0, size - 1);
+        System.arraycopy(items, 1, items, 0, size - 1);
         size--;
-        items = newOne;
         return saving;
     }
 
     @Override
     public T removeLast() {
         if (size == 0) return null;
-        T[] newOne = (T[]) new Object[size - 1];
         T saving = items[size - 1];
-        System.arraycopy(items, 0, newOne, 0, size - 1);
         size--;
-        items = newOne;
         return saving;
+    }
+    private void resize(int newSize){
+        T[] current = (T[]) new Object[newSize];
+        System.arraycopy(items , 0 , current , 0 , size);
+        items = current;
     }
 
     @Override
@@ -84,10 +81,10 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
-        else if (o.getClass() != ArrayDeque.class) return false;
-
+        if (!(o instanceof Deque)) return false;
+        if (size != ((ArrayDeque<T>) o).size) return false;
         for (int i = 0; i < size; i++) {
-            if (!this.get(i).equals(((ArrayDeque<T>) o).get(i))) return false;
+            if (!this.get(i).equals(((Deque<T>) o).get(i))) return false;
         }
         return true;
     }
