@@ -26,16 +26,13 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
-    public static Branch init(){
+    public static void init(){
         if(!GITLET_DIR.exists()){
             GITLET_DIR.mkdir();
-            Branch master = new Branch("master");
-            join(GITLET_DIR , master.getname()).mkdir();
-            return master;
+            join(GITLET_DIR , "master").mkdir();
         }else{
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         }
-        return null;
     }
 }

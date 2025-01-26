@@ -1,5 +1,11 @@
 package gitlet;
 
+import javax.imageio.IIOException;
+
+import java.io.IOException;
+
+import static gitlet.Utils.*;
+
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
@@ -18,9 +24,16 @@ public class Main {
         switch (firstArg) {
             case "init":
                 // TODO: handle the `init` command
+                Repository.init();
                 Commit init = new Commit(new Metadata("1970-01-01 00：00：00" , args[1]) , null , null , null);
-                Branch now = Repository.init();
-                now.commit(init);
+                try {
+                    join(Repository.GITLET_DIR, "HeadBranch").createNewFile();
+                }catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                writeContents(join(Repository.GITLET_DIR, "HeadBranch") , "master");
+                
+                init.loadingCommit();
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
