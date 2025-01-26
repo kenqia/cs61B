@@ -1,6 +1,8 @@
 package gitlet;
 
-public class Metadata {
+import java.io.Serializable;
+
+public class Metadata implements Serializable {
     String timestamp;
     String logMessage;
     public Metadata(String time , String log){

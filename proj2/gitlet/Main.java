@@ -40,7 +40,7 @@ public class Main {
                 init.loadingCommit();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                Repository.add(args[1]);
                 break;
             default:
                 System.out.println("No command with that name exists.");

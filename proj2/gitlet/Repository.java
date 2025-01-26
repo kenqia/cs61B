@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
+
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -35,6 +37,34 @@ public class Repository {
         }else{
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
+        }
+    }
+
+    public static void add(String name){
+        File theFile = join(join(CWD , "gitlet") , name);
+        if(!theFile.exists()){
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }else{
+            String contents = readContentsAsString(theFile);
+            String hashCode = sha1(name);
+            Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+            Blobs[] find = nowBranch.HEAD.getBlob();
+
+            String index = hashCode.substring(0 , 2);
+            File whereAdding = join(GITLET_DIR , "stagingArea");
+            join(whereAdding , index).mkdir();
+            try {
+                if (!join(join(whereAdding, index), hashCode.substring(2)).exists())
+                join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
+                else{
+                    restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
+                    join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            writeContents(join(join(whereAdding, index), hashCode.substring(2)) , contents);
         }
     }
 
