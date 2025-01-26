@@ -4,6 +4,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 
 import static gitlet.Utils.*;
@@ -15,7 +16,7 @@ import static gitlet.Utils.*;
  *
  *  kenqia
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
      *
@@ -41,15 +42,18 @@ public class Commit {
 
 
     public void loadingCommit(){
-        int hash = this.hashCode();
-        String index = String.valueOf(hash).substring(0 , 2);
-        String nowBranch = readContentsAsString(join(Repository.GITLET_DIR , "HeadBranch"));
-        File whereCommiting = join(Repository.GITLET_DIR , nowBranch);
+        String hash = Utils.sha1(this.toString());
+        String index = hash.substring(0 , 2);
+        File whereCommiting = join(Repository.GITLET_DIR , "commits");
         join(whereCommiting , index).mkdir();
         try {
-            join(join(whereCommiting, index), String.valueOf(hash).substring(2)).createNewFile();
+            join(join(whereCommiting, index), hash.substring(2)).createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        writeObject(join(join(whereCommiting, index), hash.substring(2)) , this );
+
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+        nowBranch.HEAD = this;
     }
 }
