@@ -9,7 +9,7 @@ import static gitlet.Utils.*;
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  kenqia
  */
 public class Repository {
     /**
@@ -26,4 +26,16 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
+    public static Branch init(){
+        if(!GITLET_DIR.exists()){
+            GITLET_DIR.mkdir();
+            Branch master = new Branch("master");
+            join(GITLET_DIR , master.getname()).mkdir();
+            return master;
+        }else{
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        }
+        return null;
+    }
 }
