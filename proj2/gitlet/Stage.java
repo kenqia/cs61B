@@ -1,7 +1,11 @@
 package gitlet;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.Serializable;
+import java.util.TreeSet;
+
+import static gitlet.Utils.*;
 
 public class Stage implements Serializable {
     private node[] head;
@@ -55,14 +59,18 @@ public class Stage implements Serializable {
         return this.head;
     }
 
-    public void check(Blobs Trees){
+    public Blobs check(Blobs Trees){
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
-                Trees.checkBlobs(x.code , x.name);
+                String index = x.code.substring(0 , 2);
+                File find = join(Repository.GITLET_DIR , "stagingArea");
+                String contents = readContentsAsString(join(join(find, index), x.code.substring(2)));
+                Trees.checkBlobs(x.code , x.name , contents);
                 x = x.next;
             }
         }
+        return Trees;
     }
 
 

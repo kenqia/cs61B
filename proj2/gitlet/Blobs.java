@@ -1,64 +1,91 @@
 package gitlet;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+
+import static gitlet.Utils.join;
+import static gitlet.Utils.writeContents;
 
 public class Blobs implements Serializable {
     private Blob root;
 
 
-    public int checkBlobs(String code , String name){
-        if(searchExist(code)){
+    public void savingBlob(Blob bro){
+        String code = bro.hashCode;
+        String index = code.substring(0 , 2);
+        File whereSaving = join(Repository.GITLET_DIR , "objects");
+        join(whereSaving , index).mkdir();
+        try {
+            if (!join(join(whereSaving, index), code.substring(2)).exists())
+                join(join(whereSaving, index), code.substring(2)).createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(join(join(whereSaving, index), code.substring(2)) , bro.contents);
+    }
 
+    public void checkBlobs(String code , String name , String contents){
+        if(searchExist(name)){
+            Blob bro = search(name);
+            savingBlob(bro);
+            bro.contents = contents;
+            bro.hashCode = code;
+            return;
+        }else{
+            add(code , name , contents);
         }
     }
 
 
-    public Blob search(String code) {
-        if (code == null) return null;
+    public Blob search(String name) {
+        if (name == null) return null;
         else {
-            return searchTime(root, code);
+            return searchTime(root, name);
         }
     }
 
-    public boolean searchExist(String code) {
-        if (code == null) return false;
+    public boolean searchExist(String name) {
+        if (name == null) return false;
         else {
-            return searchTimeExist(root, code);
+            return searchTimeExist(root, name);
         }
     }
 
-    private boolean searchTimeExist(Blob root, String code) {
+    private boolean searchTimeExist(Blob root, String name) {
         if (root == null) return false;
-        int cmp = code.compareTo(root.hashCode);
-        if (cmp > 0) return searchTimeExist(root.right, code);
-        else if (cmp < 0) return searchTimeExist(root.left, code);
+        int cmp = name.compareTo(root.name);
+        if (cmp > 0) return searchTimeExist(root.right, name);
+        else if (cmp < 0) return searchTimeExist(root.left, name);
         else return true;
     }
 
 
-    private Blob searchTime(Blob root, String code) {
+    private Blob searchTime(Blob root, String name) {
         if (root == null) return null;
-        int cmp = code.compareTo(root.hashCode);
-        if (cmp > 0) return searchTime(root.right, code);
-        else if (cmp < 0) return searchTime(root.left, code);
+        int cmp = name.compareTo(root.name);
+        if (cmp > 0) return searchTime(root.right, name);
+        else if (cmp < 0) return searchTime(root.left, name);
         else return root;
     }
 
-    public void add(String code , String name) {
-        if (this.root == null) root = new Blob(code, null, null, "BLACK" , name);
-        else this.root = addidk(this.root, code , name);
+    public void add(String code , String name , String contents) {
+        if (this.root == null) root = new Blob(code, null, null, "BLACK" , name , contents);
+        else this.root = addidk(this.root, code , name , contents);
         if (root != null) {
             root.color = "BLACK";
         }
     }
 
-    private Blob addidk(Blob node, String code , String name) {
+    private Blob addidk(Blob node, String code , String name , String contents) {
         if (node == null) {
-            return new Blob(code, null, null, "RED" , name);
+            Blob sister = new Blob(code, null, null, "RED" , name , contents);
+            savingBlob(sister);
+            return sister;
         }
-        int cmp = code.compareTo(node.hashCode);
-        if (cmp > 0) node.right = addidk(node.right, code , name);
-        else if (cmp < 0) node.left = addidk(node.left, code , name);
+        int cmp = name.compareTo(node.name);
+        if (cmp > 0) node.right = addidk(node.right, code , name , contents);
+        else if (cmp < 0) node.left = addidk(node.left, code , name , contents);
         else return node;
 
         if (node.right.isRed() && !node.left.isRed()) {
@@ -98,18 +125,20 @@ public class Blobs implements Serializable {
 
 
     public class Blob implements Serializable {
+        private String contents;
         private String hashCode;
         private String name;
         private Blob left;
         private Blob right;
         private String color;
 
-        public Blob(String code, Blob left, Blob right, String color , String name) {
+        public Blob(String code, Blob left, Blob right, String color , String name , String contents) {
             this.hashCode = code;
             this.left = left;
             this.right = right;
             this.color = color;
             this.name = name;
+            this.contents = contents;
         }
 
         private boolean isRed() {

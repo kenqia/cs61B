@@ -34,6 +34,7 @@ public class Repository {
             GITLET_DIR.mkdir();
             join(GITLET_DIR , "commits").mkdir();
             join(GITLET_DIR , "stagingArea").mkdir();
+            join(GITLET_DIR , "objects").mkdir();
         }else{
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
@@ -79,5 +80,6 @@ public class Repository {
     public static void commit(){
 
     }
+
 
 }
