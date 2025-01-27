@@ -42,24 +42,29 @@ public class Commit implements Serializable {
 
 
     public void loadingCommit(){
+
+        /** 获取hashcode 与存储路径*/
         String hash = Utils.sha1(this.toString());
         String index = hash.substring(0 , 2);
         File whereCommiting = join(Repository.GITLET_DIR , "commits");
+        /** 创建相关文件夹 文件 */
         join(whereCommiting , index).mkdir();
         try {
             join(join(whereCommiting, index), hash.substring(2)).createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        /** 写入commit信息 */
         writeObject(join(join(whereCommiting, index), hash.substring(2)) , this );
 
+        /** 更改HEADBRANCH 文件信息*/
         Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
         nowBranch.HEAD = this;
         writeObject(join(Repository.GITLET_DIR , "HeadBranch") , nowBranch);
     }
 
     public void checkStage(){
-        /** remake */
+        /** remake and add */
         Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
         this.file = nowStage.check(this.getBlob());
     }

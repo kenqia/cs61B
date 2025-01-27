@@ -7,12 +7,15 @@ import java.io.Serializable;
 import static gitlet.Utils.join;
 import static gitlet.Utils.writeContents;
 
+/** Blobs 是存储Blob的LLRB树 , Blob 是存储文件信息的类 */
 public class Blobs implements Serializable {
-    private Blob root;
+    private Blob root; /** Top Blob */
 
-
+    /** 把指定Blob的信息(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
     public void savingBlob(Blob bro){
+
         String code = bro.hashCode;
+        /** 存储 */
         String index = code.substring(0 , 2);
         File whereSaving = join(Repository.GITLET_DIR , "objects");
         join(whereSaving , index).mkdir();
@@ -22,10 +25,13 @@ public class Blobs implements Serializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        /** 写入 */
         writeContents(join(join(whereSaving, index), code.substring(2)) , bro.contents);
     }
 
+    /** commit时 检查stage区与上一个commit的关系 */
     public void checkBlobs(String code , String name , String contents){
+        /** 若有相同名字 ， 则覆盖 */
         if(searchExist(name)){
             Blob bro = search(name);
             savingBlob(bro);
@@ -33,6 +39,7 @@ public class Blobs implements Serializable {
             bro.hashCode = code;
             return;
         }else{
+            /** 没有 则添加 */
             add(code , name , contents);
         }
     }
@@ -145,6 +152,9 @@ public class Blobs implements Serializable {
             return this.color.equals("RED");
         }
 
+        public String getContents(){
+            return this.contents;
+        }
     }
 
 

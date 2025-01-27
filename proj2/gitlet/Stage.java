@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.TreeSet;
 
 import static gitlet.Utils.*;
-
+/** 存储存储区的数据 使用hash table */
 public class Stage implements Serializable {
     private node[] head;
     private int size;
@@ -36,6 +36,7 @@ public class Stage implements Serializable {
         head.next = hehe;
     }
 
+    /** 检查 比例 调整大小 */
     private void check(int stageSize, int dequeSize) {
         if ((double) dequeSize / (double) stageSize >= 1.5) {
             resize();
@@ -58,7 +59,7 @@ public class Stage implements Serializable {
     public node[] getHead(){
         return this.head;
     }
-
+    /** commit操作中 遍历存储区 执行操作 */
     public Blobs check(Blobs Trees){
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
@@ -67,10 +68,15 @@ public class Stage implements Serializable {
                 File find = join(Repository.GITLET_DIR , "stagingArea");
                 String contents = readContentsAsString(join(join(find, index), x.code.substring(2)));
                 Trees.checkBlobs(x.code , x.name , contents);
+                restrictedDelete(join(join(find, index), x.code.substring(2)));
                 x = x.next;
             }
         }
         return Trees;
+    }
+
+    public int getSize(){
+        return this.size;
     }
 
 

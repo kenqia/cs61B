@@ -30,6 +30,7 @@ public class Repository {
     /* TODO: fill in the rest of this class. */
 
     public static void init(){
+        /**创建各种文件夹*/
         if(!GITLET_DIR.exists()){
             GITLET_DIR.mkdir();
             join(GITLET_DIR , "commits").mkdir();
@@ -42,26 +43,31 @@ public class Repository {
     }
 
     public static void add(String name){
+        /** 获取要add的文件路径 */
         File theFile = join(join(CWD , "gitlet") , name);
+        /** 是否存在 */
         if(!theFile.exists()){
             System.out.println("File does not exist.");
             System.exit(0);
         }else{
+            /**获取文件 内容 hashcode */
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(readContents(theFile));
-
+            /** 检查当前commit的文件 , 先获取其Blobs*/
             Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();
-
+            /** 存储路径 */
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
-
-            if(find != null && find.searchExist(hashCode)){
+            /** 检查当前commit的文件 所add文件是否已存在当前commit*/
+            if(find != null && (find.search(name).getContents() == contents)){
                     if (join(join(whereAdding, index), hashCode.substring(2)).exists())
+                        /** 存在就删掉 */
                         restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
                 System.exit(0);
             }
 
+            /** add File 到存储区*/
             join(whereAdding , index).mkdir();
             try {
                 if (!join(join(whereAdding, index), hashCode.substring(2)).exists())
@@ -70,6 +76,7 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             writeContents(join(join(whereAdding, index), hashCode.substring(2)) , contents);
+            /** 更新存储区文件内容 */
             Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
             nowStage.add(hashCode , name);
             writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage);
