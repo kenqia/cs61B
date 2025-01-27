@@ -49,10 +49,16 @@ public class Repository {
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(name);
             Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-            Blobs[] find = nowBranch.HEAD.getBlob();
-
+            Blobs find = nowBranch.HEAD.getBlob();
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
+
+            if(find.searchExist(hashCode)){
+                    if (join(join(whereAdding, index), hashCode.substring(2)).exists())
+                        restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
+                System.exit(0);
+            }
+
             join(whereAdding , index).mkdir();
             try {
                 if (!join(join(whereAdding, index), hashCode.substring(2)).exists())

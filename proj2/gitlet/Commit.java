@@ -29,8 +29,8 @@ public class Commit implements Serializable {
     private Metadata metadata;
     private Commit parent;
     private Commit parentMerge;
-    private Blobs[] file;
-    public Commit(Metadata data , Commit first , Commit second , Blobs[] filehere){
+    private Blobs file;
+    public Commit(Metadata data , Commit first , Commit second , Blobs filehere){
      this.metadata = data;
      this.parent = first;
      this.parentMerge = second;
@@ -59,7 +59,7 @@ public class Commit implements Serializable {
     }
 
 
-    public Blobs[] getBlob(){
+    public Blobs getBlob(){
         return this.file;
     }
 }
