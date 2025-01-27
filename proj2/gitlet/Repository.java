@@ -53,7 +53,7 @@ public class Repository {
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
 
-            if(find.searchExist(hashCode)){
+            if(find != null && find.searchExist(hashCode)){
                     if (join(join(whereAdding, index), hashCode.substring(2)).exists())
                         restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
                 System.exit(0);
@@ -63,10 +63,6 @@ public class Repository {
             try {
                 if (!join(join(whereAdding, index), hashCode.substring(2)).exists())
                 join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
-                else{
-                    restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
-                    join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
-                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

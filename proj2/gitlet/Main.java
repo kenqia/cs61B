@@ -25,10 +25,7 @@ public class Main {
         String firstArg = args[0];
         switch (firstArg) {
             case "init":
-                // TODO: handle the `init` command
                 Repository.init();
-
-                Commit init = new Commit(new Metadata("1970-01-01 00：00：00" , args[1]) , null , null , null);
                 try {
                     join(Repository.GITLET_DIR, "HeadBranch").createNewFile();
                 }catch (IOException e) {
@@ -37,9 +34,16 @@ public class Main {
 
                 writeObject(join(Repository.GITLET_DIR, "HeadBranch") , new Branch("master"));
 
-                init.loadingCommit();
+                if(!(args.length == 1)) {
+                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, null);
+                    init.loadingCommit();
+                }else{
+                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", null), null, null, null);
+                    init.loadingCommit();
+                }
                 break;
             case "add":
+                if(!Repository.GITLET_DIR.exists()) System.exit(0);
                 Repository.add(args[1]);
                 break;
             default:
