@@ -47,9 +47,11 @@ public class Repository {
             System.exit(0);
         }else{
             String contents = readContentsAsString(theFile);
-            String hashCode = sha1(name);
+            String hashCode = sha1(readContents(theFile));
+
             Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();
+
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
 
@@ -67,7 +69,15 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             writeContents(join(join(whereAdding, index), hashCode.substring(2)) , contents);
+            Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+            nowStage.add(hashCode , name);
+            writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage);
         }
+    }
+
+
+    public static void commit(){
+
     }
 
 }

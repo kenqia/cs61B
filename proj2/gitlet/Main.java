@@ -3,6 +3,8 @@ package gitlet;
 import javax.imageio.IIOException;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static gitlet.Utils.*;
 
@@ -28,11 +30,13 @@ public class Main {
                 Repository.init();
                 try {
                     join(Repository.GITLET_DIR, "HeadBranch").createNewFile();
+                    join(Repository.GITLET_DIR, "StageFile").createNewFile();
                 }catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 writeObject(join(Repository.GITLET_DIR, "HeadBranch") , new Branch("master"));
+                writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(0));
 
                 if(!(args.length == 1)) {
                     Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, null);
@@ -45,6 +49,18 @@ public class Main {
             case "add":
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
                 Repository.add(args[1]);
+                break;
+            case "commit":
+                if(!Repository.GITLET_DIR.exists()) System.exit(0);
+                Date date = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+                Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+
+                Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, nowBranch.HEAD.getBlob());
+
+                wantToCommit.checkStage();
+                wantToCommit.loadingCommit();
                 break;
             default:
                 System.out.println("No command with that name exists.");
