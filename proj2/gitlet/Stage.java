@@ -51,6 +51,19 @@ public class Stage implements Serializable {
         this.head = one.head;
         this.size = one.size;
     }
+    public node[] getHead(){
+        return this.head;
+    }
+
+    public void check(Blobs Trees){
+        for (int i = 0; i < this.head.length; i++) {
+            node x = head[i].next;
+            while (x != null) {
+                Trees.checkBlobs(x.code , x.name);
+                x = x.next;
+            }
+        }
+    }
 
 
     private class node implements Serializable {

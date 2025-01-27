@@ -61,7 +61,8 @@ public class Commit implements Serializable {
     public void checkStage(){
         /** remake */
         Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
-
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+        nowStage.check(nowBranch.HEAD.getBlob());
     }
 
 

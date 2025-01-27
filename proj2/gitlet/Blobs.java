@@ -5,6 +5,14 @@ import java.io.Serializable;
 public class Blobs implements Serializable {
     private Blob root;
 
+
+    public int checkBlobs(String code , String name){
+        if(searchExist(code)){
+
+        }
+    }
+
+
     public Blob search(String code) {
         if (code == null) return null;
         else {
@@ -36,21 +44,21 @@ public class Blobs implements Serializable {
         else return root;
     }
 
-    public void add(String code) {
-        if (this.root == null) root = new Blob(code, null, null, "BLACK");
-        else this.root = addidk(this.root, code);
+    public void add(String code , String name) {
+        if (this.root == null) root = new Blob(code, null, null, "BLACK" , name);
+        else this.root = addidk(this.root, code , name);
         if (root != null) {
             root.color = "BLACK";
         }
     }
 
-    private Blob addidk(Blob node, String code) {
+    private Blob addidk(Blob node, String code , String name) {
         if (node == null) {
-            return new Blob(code, null, null, "RED");
+            return new Blob(code, null, null, "RED" , name);
         }
         int cmp = code.compareTo(node.hashCode);
-        if (cmp > 0) node.right = addidk(node.right, code);
-        else if (cmp < 0) node.left = addidk(node.left, code);
+        if (cmp > 0) node.right = addidk(node.right, code , name);
+        else if (cmp < 0) node.left = addidk(node.left, code , name);
         else return node;
 
         if (node.right.isRed() && !node.left.isRed()) {
@@ -90,16 +98,18 @@ public class Blobs implements Serializable {
 
 
     public class Blob implements Serializable {
-        String hashCode;
-        Blob left;
-        Blob right;
-        String color;
+        private String hashCode;
+        private String name;
+        private Blob left;
+        private Blob right;
+        private String color;
 
-        public Blob(String code, Blob left, Blob right, String color) {
+        public Blob(String code, Blob left, Blob right, String color , String name) {
             this.hashCode = code;
             this.left = left;
             this.right = right;
             this.color = color;
+            this.name = name;
         }
 
         private boolean isRed() {
