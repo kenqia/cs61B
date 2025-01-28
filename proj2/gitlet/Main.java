@@ -43,8 +43,7 @@ public class Main {
 
                 /** 新建存储文件信息 */
                 writeObject(join(Repository.GITLET_DIR, "HeadBranch") , new Branch("master"));
-                writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(0));
-
+                writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(1));
                 /** 为init创建commit */
                 if(args.length != 1) {
                     Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, null);
@@ -56,6 +55,9 @@ public class Main {
                 break;
             /** add */
             case "add":
+                if(args.length == 1) {
+                    System.exit(0);
+                }
                 /** 检查是否init */
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
 
@@ -63,7 +65,7 @@ public class Main {
 
                 break;
             case "commit":
-                if(args.length != 1) {
+                if(args.length == 1) {
                     System.out.println("Please enter a commit message.");
                     System.exit(0);
                 }

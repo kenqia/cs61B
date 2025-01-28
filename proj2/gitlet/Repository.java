@@ -60,7 +60,7 @@ public class Repository {
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
             /** 检查当前commit的文件 所add文件是否已存在当前commit*/
-            if(find != null && (find.search(name).getContents() == contents)){
+            if(find != null && find.searchExist(name) && (find.search(name).getContents() == contents)){
                     if (join(join(whereAdding, index), hashCode.substring(2)).exists())
                         /** 存在就删掉 */
                         restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));

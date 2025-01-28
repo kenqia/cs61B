@@ -21,7 +21,7 @@ public class Stage implements Serializable {
     }
 
     public void add(String code , String name) {
-        int index = Integer.parseInt(code) % head.length;
+        int index = code.hashCode() % head.length;
         node adding = new node(null, code , name);
         addlast(head[index], adding);
         size++;
