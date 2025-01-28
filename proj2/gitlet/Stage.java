@@ -103,6 +103,26 @@ public class Stage implements Serializable {
         return null;
     }
 
+    public node removeStage(String name){
+        for (int i = 0; i < this.head.length; i++) {
+            node ptr = head[i];
+            node x = head[i].next;
+            while (x != null) {
+                if(x.name.equals(name)){
+                    ptr.next = x.next;
+                    String index = x.code.substring(0 , 2);
+                    File find = join(Repository.GITLET_DIR , "stagingArea");
+                    join(join(find, index), x.code.substring(2)).delete();
+                    join(find, index).delete();
+                    return x;
+                };
+                x = x.next;
+                ptr = ptr.next;
+            }
+        }
+        return null;
+    }
+
     public int getSize(){
         return this.size;
     }

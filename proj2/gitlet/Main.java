@@ -94,6 +94,27 @@ public class Main {
                 /**  重置 stage */
                 writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
                 break;
+            case "rm":
+                if(args.length == 1) {
+                    System.exit(0);
+                }
+                /** 检查是否init */
+                if(!Repository.GITLET_DIR.exists()) System.exit(0);
+
+                /** 取消暂存文件 */
+                Stage nowStage1 = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+                if(nowStage1.isExist(args[1])){
+                    nowStage1.removeStage(args[1]);
+                    writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage1);
+                    System.exit(0);
+                }
+                /** 添加删除信息 */
+                Branch nowBranch1 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                if(nowBranch1.HEAD.getBlob().searchExist(args[1])){
+                    Repository.addRemove(args[1]);
+                    nowStage1.add("0000000000000000000000000000000000000000" , args[1] );
+                }
+
             default:
                 System.out.println("No command with that name exists.");
                 break;

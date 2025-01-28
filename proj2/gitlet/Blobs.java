@@ -35,6 +35,13 @@ public class Blobs implements Serializable {
         if(searchExist(name)){
             Blob bro = search(name);
             savingBlob(bro);
+            /** 判断是否为移除操作 */
+            if(code.equals("0000000000000000000000000000000000000000")){
+                String[] toRemove = contents.split("\n");
+                for(String item : toRemove){
+                    removeBlob(item);
+                }
+            }
             bro.contents = contents;
             bro.hashCode = code;
             return;

@@ -87,9 +87,20 @@ public class Repository {
         }
     }
 
+    /**向Stage区储存remove信息 */
+    public static void addRemove(String name){
+        File whereAdding = join(GITLET_DIR , "stagingArea");
 
-    public static void commit(){
-
+        if(!join(whereAdding , "00").exists()){
+            join(whereAdding , "00").mkdir();
+        }
+        try {
+            if (!join(join(whereAdding , "00") , "00000000000000000000000000000000000000").exists())
+                join(join(whereAdding , "00") , "00000000000000000000000000000000000000").createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(join(join(whereAdding , "00") , "00000000000000000000000000000000000000") , readContentsAsString(join(join(whereAdding , "00") , "0000000000000000000000000000000000000")) + name + "\n");
     }
 
 
