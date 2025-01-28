@@ -77,7 +77,10 @@ public class Blobs implements Serializable {
     }
 
     public void add(String code , String name , String contents) {
-        if (this.root == null) root = new Blob(code, null, null, "BLACK" , name , contents);
+        if (this.root == null){
+            root = new Blob(code, null, null, "BLACK" , name , contents);
+            savingBlob(root);
+        }
         else this.root = addidk(this.root, code , name , contents);
         if (root != null) {
             root.color = "BLACK";
@@ -95,11 +98,11 @@ public class Blobs implements Serializable {
         else if (cmp < 0) node.left = addidk(node.left, code , name , contents);
         else return node;
 
-        if (node.right.isRed() && !node.left.isRed()) {
+        if (isRed(node.right) && !isRed(node.left)) {
             node = rotateLeft(node);
-        } else if (node.left.isRed() && node.left.left.isRed()) {
+        } else if (isRed(node.left) && isRed(node.left.left)) {
             node = rotateRight(node);
-        } else if (node.right.isRed() && node.left.isRed()) {
+        } else if (isRed(node.right) && isRed(node.left)) {
             filpColor(node);
         }
         return node;
@@ -130,6 +133,10 @@ public class Blobs implements Serializable {
         if (node.right != null) node.right.color = "BLACK";
     }
 
+    private boolean isRed(Blob node){
+        return node != null && node.color.equals("RED");
+    }
+
 
     public class Blob implements Serializable {
         private String contents;
@@ -146,10 +153,6 @@ public class Blobs implements Serializable {
             this.color = color;
             this.name = name;
             this.contents = contents;
-        }
-
-        private boolean isRed() {
-            return this.color.equals("RED");
         }
 
         public String getContents(){

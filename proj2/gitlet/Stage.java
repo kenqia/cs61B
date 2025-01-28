@@ -21,7 +21,7 @@ public class Stage implements Serializable {
     }
 
     public void add(String code , String name) {
-        int index = code.hashCode() % head.length;
+        int index = Math.abs(code.hashCode()) % head.length;
         node adding = new node(null, code , name);
         addlast(head[index], adding);
         size++;
@@ -68,11 +68,39 @@ public class Stage implements Serializable {
                 File find = join(Repository.GITLET_DIR , "stagingArea");
                 String contents = readContentsAsString(join(join(find, index), x.code.substring(2)));
                 Trees.checkBlobs(x.code , x.name , contents);
-                restrictedDelete(join(join(find, index), x.code.substring(2)));
+                join(join(find, index), x.code.substring(2)).delete();
+                join(find, index).delete();
                 x = x.next;
             }
         }
         return Trees;
+    }
+
+    public boolean isExist(String name){
+        for (int i = 0; i < this.head.length; i++) {
+            node x = head[i].next;
+            while (x != null) {
+                if(x.name.equals(name)) return true;
+                x = x.next;
+            }
+        }
+        return false;
+    }
+
+    public node remove(String name){
+        for (int i = 0; i < this.head.length; i++) {
+            node ptr = head[i];
+            node x = head[i].next;
+            while (x != null) {
+                if(x.name.equals(name)){
+                    ptr.next = x.next;
+                    return x;
+                };
+                x = x.next;
+                ptr = ptr.next;
+            }
+        }
+        return null;
     }
 
     public int getSize(){

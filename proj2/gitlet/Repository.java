@@ -60,12 +60,20 @@ public class Repository {
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
             /** 检查当前commit的文件 所add文件是否已存在当前commit*/
-            if(find != null && find.searchExist(name) && (find.search(name).getContents() == contents)){
+            if(find != null && find.searchExist(name) && (find.search(name).getContents().equals(contents))){
                     if (join(join(whereAdding, index), hashCode.substring(2)).exists())
                         /** 存在就删掉 */
-                        restrictedDelete( join(join(whereAdding, index), hashCode.substring(2)));
+                        join(join(whereAdding , index), hashCode.substring(2)).delete();
+                        join(whereAdding , index).delete();
                 System.exit(0);
             }
+            /** 更新存储区文件内容 */
+            Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+            if(nowStage.isExist(name)){
+               nowStage.remove(name);
+            }
+            nowStage.add(hashCode , name);
+            writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage);
 
             /** add File 到存储区*/
             join(whereAdding , index).mkdir();
@@ -76,10 +84,6 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             writeContents(join(join(whereAdding, index), hashCode.substring(2)) , contents);
-            /** 更新存储区文件内容 */
-            Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
-            nowStage.add(hashCode , name);
-            writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage);
         }
     }
 

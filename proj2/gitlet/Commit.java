@@ -26,7 +26,7 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
 
-    private Metadata metadata;
+    public Metadata metadata;
     private Commit parent;
     private Commit parentMerge;
     private Blobs file;
@@ -44,7 +44,7 @@ public class Commit implements Serializable {
     public void loadingCommit(){
 
         /** 获取hashcode 与存储路径*/
-        String hash = Utils.sha1(this.toString());
+        String hash = Utils.sha1(this.getBlob().toString() + this.metadata.logMessage + this.metadata.timestamp);
         String index = hash.substring(0 , 2);
         File whereCommiting = join(Repository.GITLET_DIR , "commits");
         /** 创建相关文件夹 文件 */
