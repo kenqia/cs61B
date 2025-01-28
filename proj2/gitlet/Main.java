@@ -114,6 +114,7 @@ public class Main {
                 if(nowBranch1.HEAD.getBlob().searchExist(args[1])){
                     Repository.addRemove(args[1]);
                     nowStage1.add("0000000000000000000000000000000000000000" , args[1] );
+                    writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage1);
                 }else{
                     System.out.println("No reason to remove the file.");
                     System.exit(0);
@@ -126,9 +127,9 @@ public class Main {
                 /**递归遍历commit内容 */
                 while (x != null){
                     System.out.println("===");
-                    System.out.println(x.getHashCode());
+                    System.out.println("commit " + x.getHashCode());
                     if(x.getParentMerge() != null) System.out.println("Merge: " + x.getParent().getHashCode().substring(0 , 7) + " " + x.getParentMerge().getHashCode().substring(0 , 7));
-                    System.out.println(x.metadata.timestamp);
+                    System.out.println("Date: " + x.metadata.timestamp);
                     System.out.println(x.metadata.logMessage);
                     System.out.println();
                     x = x.getParent();

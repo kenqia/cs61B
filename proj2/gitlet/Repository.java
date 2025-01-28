@@ -100,7 +100,8 @@ public class Repository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        writeContents(join(join(whereAdding , "00") , "00000000000000000000000000000000000000") , readContentsAsString(join(join(whereAdding , "00") , "0000000000000000000000000000000000000")) + name + "\n");
+        writeContents(join(join(whereAdding , "00") , "00000000000000000000000000000000000000") , readContentsAsString(join(join(whereAdding , "00") , "00000000000000000000000000000000000000")) + name + "\n");
+        Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
     }
 
 

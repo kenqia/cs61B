@@ -24,8 +24,8 @@ public class Stage implements Serializable {
         int index = Math.abs(code.hashCode()) % head.length;
         node adding = new node(null, code , name);
         addlast(head[index], adding);
-        size++;
         head[index].size++;
+        if(this.head[index].size == 1) this.size++;
         check(this.size, head[index].size);
     }
 
@@ -94,6 +94,8 @@ public class Stage implements Serializable {
             while (x != null) {
                 if(x.name.equals(name)){
                     ptr.next = x.next;
+                    this.head[i].size--;
+                    if(this.head[i].size == 0) this.size--;
                     return x;
                 };
                 x = x.next;
@@ -114,6 +116,8 @@ public class Stage implements Serializable {
                     File find = join(Repository.GITLET_DIR , "stagingArea");
                     join(join(find, index), x.code.substring(2)).delete();
                     join(find, index).delete();
+                    this.head[i].size--;
+                    if(this.head[i].size == 0) this.size--;
                     return x;
                 };
                 x = x.next;
