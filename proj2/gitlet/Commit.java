@@ -30,11 +30,13 @@ public class Commit implements Serializable {
     private Commit parent;
     private Commit parentMerge;
     private Blobs file;
+    private String hashCode;
     public Commit(Metadata data , Commit first , Commit second , Blobs filehere){
      this.metadata = data;
      this.parent = first;
      this.parentMerge = second;
      this.file = filehere;
+     this.hashCode = Utils.sha1(this.getBlob().toString() + this.metadata.logMessage + this.metadata.timestamp);
     }
 
     /** The message of this Commit. */
@@ -44,18 +46,17 @@ public class Commit implements Serializable {
     public void loadingCommit(){
 
         /** 获取hashcode 与存储路径*/
-        String hash = Utils.sha1(this.getBlob().toString() + this.metadata.logMessage + this.metadata.timestamp);
-        String index = hash.substring(0 , 2);
+        String index = this.hashCode.substring(0 , 2);
         File whereCommiting = join(Repository.GITLET_DIR , "commits");
         /** 创建相关文件夹 文件 */
         join(whereCommiting , index).mkdir();
         try {
-            join(join(whereCommiting, index), hash.substring(2)).createNewFile();
+            join(join(whereCommiting, index), this.hashCode.substring(2)).createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         /** 写入commit信息 */
-        writeObject(join(join(whereCommiting, index), hash.substring(2)) , this );
+        writeObject(join(join(whereCommiting, index), this.hashCode.substring(2)) , this );
 
         /** 更改HEADBRANCH 文件信息*/
         Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
@@ -72,5 +73,17 @@ public class Commit implements Serializable {
 
     public Blobs getBlob(){
         return this.file;
+    }
+
+    public Commit getParent(){
+        return this.parent;
+    }
+
+    public Commit getParentMerge(){
+        return this.parentMerge;
+    }
+
+    public String getHashCode(){
+        return this.hashCode;
     }
 }

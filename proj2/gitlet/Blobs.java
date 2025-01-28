@@ -41,6 +41,7 @@ public class Blobs implements Serializable {
                 for(String item : toRemove){
                     removeBlob(item);
                 }
+                return;
             }
             bro.contents = contents;
             bro.hashCode = code;
@@ -142,6 +143,70 @@ public class Blobs implements Serializable {
 
     private boolean isRed(Blob node){
         return node != null && node.color.equals("RED");
+    }
+
+    private void removeBlob(String name){
+        if(name == null) return;
+        this.root = removeBlobTime(root , name);
+    }
+
+    private Blob removeBlobTime(Blob root , String name){
+        if(root == null ) return null;
+
+        int cmp = name.compareTo(root.name);
+        if(cmp > 0){
+            root.right = removeBlobTime(root.right , name);
+        }
+        else if(cmp < 0){
+            root.left = removeBlobTime(root.left , name);
+        }
+        else{
+            if(root.left == null && root.right == null) return null;
+            else if(root.left != null && root.right != null){
+                root = swapAfter(root);
+            }
+            else{
+                if(root.left != null) return root.left;
+                return root.right;
+            }
+        }
+        if (isRed(root.right) && !isRed(root.left)) {
+            root = rotateLeft(root);
+        } else if (isRed(root.left) && isRed(root.left.left)) {
+            root = rotateRight(root);
+        } else if (isRed(root.right) && isRed(root.left)) {
+            filpColor(root);
+        }
+        return root;
+        
+    }
+        /** 交换前驱节点并删除 */
+    private Blob swapAfter(Blob root){
+        if(root.left.right != null){
+            root.hashCode = root.left.right.hashCode;
+            root.name = root.left.right.name;
+            root.contents = root.left.right.contents;
+            if(root.left.right.left == null && root.left.right.right == null){
+                root.left.right=null;
+            }
+            else{
+                if(root.left.right.left != null) root.left.right = root.left.right.left;
+                else root.left.right = root.left.right.right;
+            }
+            return root;
+        }
+        else{
+            root.hashCode = root.left.hashCode;
+            root.name = root.left.name;
+            root.contents = root.left.contents;
+            if(root.left.left == null){
+                root.left=null;
+            }
+            else{
+                root.left = root.left.left;
+            }
+            return root;
+        }
     }
 
 
