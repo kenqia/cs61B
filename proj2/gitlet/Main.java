@@ -45,10 +45,10 @@ public class Main {
                 writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
                 /** 为init创建commit */
                 if(args.length != 1) {
-                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, new Blobs());
+                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, new Blobs(null));
                     init.loadingCommit();
                 }else{
-                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", null), null, null, new Blobs());
+                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", ""), null, null, new Blobs(null));
                     init.loadingCommit();
                 }
                 break;
@@ -85,7 +85,8 @@ public class Main {
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-                Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, nowBranch.HEAD.getBlob());
+                Blobs e = new Blobs(nowBranch.HEAD.getBlob().getRoot());
+                Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, e);
 
                 /** 新Commit 添加stage区数据 */
                 wantToCommit.checkStage();
@@ -122,6 +123,7 @@ public class Main {
                 break;
             /** 日志 */
             case "log":
+                if(!Repository.GITLET_DIR.exists()) System.exit(0);
                 Branch nowBranch2 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
                 Commit x = nowBranch2.HEAD;
                 /**递归遍历commit内容 */

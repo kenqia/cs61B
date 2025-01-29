@@ -4,15 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import static gitlet.Utils.join;
-import static gitlet.Utils.writeContents;
+import static gitlet.Utils.*;
 
 /** Blobs 是存储Blob的LLRB树 , Blob 是存储文件信息的类 */
 public class Blobs implements Serializable {
     private Blob root; /** Top Blob */
 
+    public Blobs(Blob root){
+        this.root = root;
+    }
+
+    public Blob getRoot() {
+        return root;
+    }
+
     /** 把指定Blob的信息(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
-    public void savingBlob(Blob bro){
+    public void savingBlob(Blob bro , String contents){
 
         String code = bro.hashCode;
         /** 存储 */
@@ -26,7 +33,7 @@ public class Blobs implements Serializable {
             throw new RuntimeException(e);
         }
         /** 写入 */
-        writeContents(join(join(whereSaving, index), code.substring(2)) , bro.contents);
+        writeContents(join(join(whereSaving, index), code.substring(2)) , contents);
     }
 
     /** commit时 检查stage区与上一个commit的关系 */
@@ -34,7 +41,7 @@ public class Blobs implements Serializable {
         /** 若有相同名字 ， 则覆盖 */
         if(searchExist(name)){
             Blob bro = search(name);
-            savingBlob(bro);
+            savingBlob(bro , contents);
             /** 判断是否为移除操作 */
             if(code.equals("0000000000000000000000000000000000000000")){
                 String[] toRemove = contents.split("\n");
@@ -43,7 +50,6 @@ public class Blobs implements Serializable {
                 }
                 return;
             }
-            bro.contents = contents;
             bro.hashCode = code;
             return;
         }else{
@@ -86,8 +92,8 @@ public class Blobs implements Serializable {
 
     public void add(String code , String name , String contents) {
         if (this.root == null){
-            root = new Blob(code, null, null, "BLACK" , name , contents);
-            savingBlob(root);
+            root = new Blob(code, null, null, "BLACK" , name);
+            savingBlob(root , contents);
         }
         else this.root = addidk(this.root, code , name , contents);
         if (root != null) {
@@ -97,8 +103,8 @@ public class Blobs implements Serializable {
 
     private Blob addidk(Blob node, String code , String name , String contents) {
         if (node == null) {
-            Blob sister = new Blob(code, null, null, "RED" , name , contents);
-            savingBlob(sister);
+            Blob sister = new Blob(code, null, null, "RED" , name);
+            savingBlob(sister , contents);
             return sister;
         }
         int cmp = name.compareTo(node.name);
@@ -185,7 +191,6 @@ public class Blobs implements Serializable {
         if(root.left.right != null){
             root.hashCode = root.left.right.hashCode;
             root.name = root.left.right.name;
-            root.contents = root.left.right.contents;
             if(root.left.right.left == null && root.left.right.right == null){
                 root.left.right=null;
             }
@@ -198,7 +203,6 @@ public class Blobs implements Serializable {
         else{
             root.hashCode = root.left.hashCode;
             root.name = root.left.name;
-            root.contents = root.left.contents;
             if(root.left.left == null){
                 root.left=null;
             }
@@ -209,27 +213,30 @@ public class Blobs implements Serializable {
         }
     }
 
+    public static String getContents(Blob x){
+        String code = x.hashCode;
+        /** 存储 */
+        String index = code.substring(0 , 2);
+        File whereSaving = join(Repository.GITLET_DIR , "objects");
+        return readContentsAsString(join(join(whereSaving, index), code.substring(2)));
+    }
+
 
     public class Blob implements Serializable {
-        private String contents;
         private String hashCode;
         private String name;
         private Blob left;
         private Blob right;
         private String color;
 
-        public Blob(String code, Blob left, Blob right, String color , String name , String contents) {
+        public Blob(String code, Blob left, Blob right, String color , String name) {
             this.hashCode = code;
             this.left = left;
             this.right = right;
             this.color = color;
             this.name = name;
-            this.contents = contents;
         }
 
-        public String getContents(){
-            return this.contents;
-        }
     }
 
 

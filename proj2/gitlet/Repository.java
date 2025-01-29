@@ -44,13 +44,25 @@ public class Repository {
 
     public static void add(String name){
         /** 获取要add的文件路径 */
-        File theFile = join(join(CWD , "gitlet") , name);
-        /** 是否存在 */
-        if(!theFile.exists()){
-            System.out.println("File does not exist.");
-            System.exit(0);
-        }else{
-            /**获取文件 内容 hashcode */
+        File theFile = join(CWD , name);
+        /** 主目录是否存在 */
+        if(!theFile.exists()) {
+            /** 换个目录 */
+            String[] fileHere = CWD.list();
+            for (String item : fileHere) {
+                if (join(CWD, item).isDirectory()) {
+                    theFile = join(join(CWD, item), name);
+                    if (theFile.exists()) {
+                        break;
+                    }
+                }
+            }
+            if(!theFile.exists()) {
+                System.out.println("File does not exist.");
+                System.exit(0);
+            }
+        }
+        /**获取文件 内容 hashcode */
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(readContents(theFile));
             /** 检查当前commit的文件 , 先获取其Blobs*/
@@ -60,7 +72,7 @@ public class Repository {
             String index = hashCode.substring(0 , 2);
             File whereAdding = join(GITLET_DIR , "stagingArea");
             /** 检查当前commit的文件 所add文件是否已存在当前commit*/
-            if(find != null && find.searchExist(name) && (find.search(name).getContents().equals(contents))){
+            if(find != null && find.searchExist(name) && (Blobs.getContents(find.search(name)).equals(contents))){
                     if (join(join(whereAdding, index), hashCode.substring(2)).exists())
                         /** 存在就删掉 */
                         join(join(whereAdding , index), hashCode.substring(2)).delete();
@@ -84,7 +96,7 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             writeContents(join(join(whereAdding, index), hashCode.substring(2)) , contents);
-        }
+
     }
 
     /**向Stage区储存remove信息 */
