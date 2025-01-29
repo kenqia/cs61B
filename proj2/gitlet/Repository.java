@@ -36,6 +36,7 @@ public class Repository {
             join(GITLET_DIR , "commits").mkdir();
             join(GITLET_DIR , "stagingArea").mkdir();
             join(GITLET_DIR , "objects").mkdir();
+            join(GITLET_DIR , "branch").mkdir();
         }else{
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
@@ -113,7 +114,21 @@ public class Repository {
             throw new RuntimeException(e);
         }
         writeContents(join(join(whereAdding , "00") , "00000000000000000000000000000000000000") , readContentsAsString(join(join(whereAdding , "00") , "00000000000000000000000000000000000000")) + name + "\n");
-        Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+    }
+
+    /** 存储一个Branch */
+    public static void addBranch(Branch root){
+        String hashCode = root.code;
+        File whereAdding = join(GITLET_DIR , "branch");
+        String index = root.code.substring(0 , 2);
+        if(!join(whereAdding , index).exists()) join(whereAdding , index).mkdir();
+        try {
+            if (!join(join(whereAdding, index), hashCode.substring(2)).exists())
+                join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeObject(join(join(whereAdding, index), hashCode.substring(2)) , root);
     }
 
 

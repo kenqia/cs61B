@@ -3,10 +3,14 @@ package gitlet;
 import javax.swing.*;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import static gitlet.Repository.GITLET_DIR;
 import static gitlet.Utils.*;
+import static java.util.Collections.sort;
+
 /** 存储存储区的数据 使用hash table */
 public class Stage implements Serializable {
     private node[] head;
@@ -140,6 +144,41 @@ public class Stage implements Serializable {
         return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
     }
 
+    public void printInfo(){
+        /**遍历添加到order列表里 最后排序输出 , */
+        System.out.println("=== Staged Files ===");
+        List<String> removeOrder = new ArrayList<>();
+        List<String> order = new ArrayList<>();
+        for (int i = 0; i < this.head.length; i++) {
+            node x = head[i].next;
+            while (x != null) {
+                /** 拒绝add remove的stage信息*/
+                if(!x.code.equals("0000000000000000000000000000000000000000")) {
+                    order.add(x.name);
+                }
+                else{
+                    String[] removeItem = getContents(x).split("\n");
+                    for(String item : removeItem){
+                        removeOrder.add(item);
+                    }
+                }
+                x = x.next;
+            }
+        }
+        sort(order);
+        sort(removeOrder);
+        for(String item : order){
+            System.out.println(item);
+        }
+        System.out.println();
+        System.out.println("=== Removed Files ===");
+        for(String item : removeOrder){
+            System.out.println(item);
+        }
+        System.out.println();
+
+
+    }
 
     private class node implements Serializable {
         private node next;
@@ -151,6 +190,10 @@ public class Stage implements Serializable {
             this.code = code;
             this.name = name;
             this.next = next;
+        }
+
+        public int getSize(){
+            return this.size;
         }
 
 

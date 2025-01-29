@@ -61,6 +61,7 @@ public class Commit implements Serializable {
         /** 更改HEADBRANCH 文件信息*/
         Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
         nowBranch.HEAD = this;
+        Repository.addBranch(nowBranch);
         writeObject(join(Repository.GITLET_DIR , "HeadBranch") , nowBranch);
     }
 

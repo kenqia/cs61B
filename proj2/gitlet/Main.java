@@ -152,7 +152,7 @@ public class Main {
                         Commit commitItem = readObject(join(commitNow , one ) , Commit.class);
                         System.out.println("===");
                         System.out.println("commit " + commitItem.getHashCode());
-                        if(x.getParentMerge() != null) System.out.println("Merge: " + commitItem.getParent().getHashCode().substring(0 , 7) + " " + commitItem.getParentMerge().getHashCode().substring(0 , 7));
+                        if(commitItem.getParentMerge() != null) System.out.println("Merge: " + commitItem.getParent().getHashCode().substring(0 , 7) + " " + commitItem.getParentMerge().getHashCode().substring(0 , 7));
                         System.out.println("Date: " + commitItem.metadata.timestamp);
                         System.out.println(commitItem.metadata.logMessage);
                         System.out.println();
@@ -181,6 +181,31 @@ public class Main {
                 if(flag == 0){
                     System.out.println("Found no commit with that message.");
                 }
+                break;
+            /** 状态 */
+            case "status":
+
+                /** 遍历branch目录获取信息 打印branch信息 */
+                System.out.println("=== Branches ===");
+                Branch nowBranch3 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                System.out.println("*" + nowBranch3.name);
+                File whereBranch = join(Repository.GITLET_DIR , "branch");
+                String[] branchHere = whereBranch.list();
+                for (String item : branchHere) {
+                    File branchNow = join(whereBranch , item);
+                    List<String> branch = plainFilenamesIn(branchNow);
+                    for(String one : branch){
+                        Branch branchItem = readObject(join(branchNow , one) , Branch.class);
+                        if(!branchItem.name.equals(nowBranch3.name))
+                        System.out.println(branchItem.name);
+                    }
+                }
+                System.out.println();
+
+                /** 遍历stage文件 打印已stage文件信息  remove信息也在里面了*/
+                Stage nowStage2 = readObject(join(Repository.GITLET_DIR , "stageFile") , Stage.class);
+                nowStage2.printInfo();
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 break;
