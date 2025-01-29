@@ -2,9 +2,12 @@ package gitlet;
 
 import javax.imageio.IIOException;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import static gitlet.Utils.*;
 
@@ -45,10 +48,10 @@ public class Main {
                 writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
                 /** 为init创建commit */
                 if(args.length != 1) {
-                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", args[1]), null, null, new Blobs(null));
+                    Commit init = new Commit(new Metadata("Wed Dec 31 16:00:00 1969 -0800", args[1]), null, null, new Blobs(null));
                     init.loadingCommit();
                 }else{
-                    Commit init = new Commit(new Metadata("1970-01-01 00：00：00", ""), null, null, new Blobs(null));
+                    Commit init = new Commit(new Metadata("Wed Dec 31 16:00:00 1969 -0800", "initial commit"), null, null, new Blobs(null));
                     init.loadingCommit();
                 }
                 break;
@@ -81,7 +84,7 @@ public class Main {
 
                 /** 获取 时间数据 */
                 Date date = new Date();
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z", Locale.ENGLISH);
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
@@ -138,6 +141,23 @@ public class Main {
                 }
 
                 break;
+             /** 全局日志 */
+            case "global-log":
+                File whereCommit = join(Repository.GITLET_DIR , "commits");
+                String[] commitHere = whereCommit.list();
+                for (String item : commitHere) {
+                    File commitNow = join(whereCommit , item);
+                    List<String> commit = plainFilenamesIn(commitNow);
+                    for(String one : commit){
+                        Commit commitItem = readObject(join(commitNow , one ) , Commit.class);
+                        System.out.println("===");
+                        System.out.println("commit " + commitItem.getHashCode());
+                        if(x.getParentMerge() != null) System.out.println("Merge: " + commitItem.getParent().getHashCode().substring(0 , 7) + " " + commitItem.getParentMerge().getHashCode().substring(0 , 7));
+                        System.out.println("Date: " + commitItem.metadata.timestamp);
+                        System.out.println(commitItem.metadata.logMessage);
+                        System.out.println();
+                    }
+                }
             default:
                 System.out.println("No command with that name exists.");
                 break;
