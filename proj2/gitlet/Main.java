@@ -158,6 +158,29 @@ public class Main {
                         System.out.println();
                     }
                 }
+                break;
+                /** 凭借message 查询commit ID */
+            case "find":
+                int flag = 0;
+                if(args.length == 1) {
+                   System.exit(0);
+                }
+                File whereCommit1 = join(Repository.GITLET_DIR , "commits");
+                String[] commitHere1 = whereCommit1.list();
+                for (String item : commitHere1) {
+                    File commitNow = join(whereCommit1 , item);
+                    List<String> commit = plainFilenamesIn(commitNow);
+                    for(String one : commit){
+                        Commit commitItem = readObject(join(commitNow , one ) , Commit.class);
+                        if(commitItem.metadata.logMessage == args[1]){
+                            flag = 1;
+                            System.out.println("commit " + commitItem.getHashCode());
+                        }
+                    }
+                }
+                if(flag == 0){
+                    System.out.println("Found no commit with that message.");
+                }
             default:
                 System.out.println("No command with that name exists.");
                 break;
