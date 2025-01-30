@@ -5,11 +5,13 @@ import javax.imageio.IIOException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import static gitlet.Utils.*;
+import static java.util.Collections.sort;
 
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
@@ -64,7 +66,7 @@ public class Main {
                 }
                 /** 检查是否init */
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
-
+                    /** arg[1] 是相对位置 */
                 Repository.add(args[1]);
 
                 break;
@@ -191,20 +193,93 @@ public class Main {
                 System.out.println("*" + nowBranch3.name);
                 File whereBranch = join(Repository.GITLET_DIR , "branch");
                 String[] branchHere = whereBranch.list();
+                List<String> Branches = new ArrayList<>();
                 for (String item : branchHere) {
                     File branchNow = join(whereBranch , item);
                     List<String> branch = plainFilenamesIn(branchNow);
                     for(String one : branch){
                         Branch branchItem = readObject(join(branchNow , one) , Branch.class);
                         if(!branchItem.name.equals(nowBranch3.name))
-                        System.out.println(branchItem.name);
+                        Branches.add(branchItem.name);
                     }
+                }
+                sort(Branches);
+                for(String item : Branches){
+                    System.out.println(item);
                 }
                 System.out.println();
 
                 /** 遍历stage文件 打印已stage文件信息  remove信息也在里面了*/
                 Stage nowStage2 = readObject(join(Repository.GITLET_DIR , "stageFile") , Stage.class);
                 nowStage2.printInfo();
+                /** 另外两个状态 先留着*/
+                System.out.println("=== Modifications Not Staged For Commit ===");
+                System.out.println();
+                System.out.println("=== Untracked Files ===");
+                System.out.println();
+                break;
+            /** 转入到 */
+            case "checkout":
+                Branch nowBranch4 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                if(args.length == 1) System.exit(0);
+                /** 第一种java gitlet.Main checkout -- [file name] */
+                else if (args[1].equals("--")){
+                    Blobs head = nowBranch4.HEAD.getBlob();
+                    /** 文件不存在此commit中 */
+                    if(!head.searchExist(args[2])){
+                        System.out.println("File does not exist in that commit.");
+                        System.exit(0);
+                    }
+                    /** 存在file 存储到CWD */
+                    else{
+                        Blobs.Blob file = head.search(args[2]);
+                        Repository.savingBlobCWD(file);
+                    }
+                }
+                /** java gitlet.Main checkout [commit id] -- [file name] */
+                else if(args[2].equals("--")){
+                    /** 遍历搜索  */
+                    Commit search = nowBranch4.HEAD;
+                    while(search  != null ){
+                        if(search.getHashCode().equals(args[1])){
+                            /** 文件不存在此commit中 */
+                            if(!search.getBlob().searchExist(args[3])){
+                                System.out.println("File does not exist in that commit.");
+                                System.exit(0);
+                            }
+                            /** 存在file 存储到CWD */
+                            else{
+                                Blobs.Blob file = search.getBlob().search(args[3]);
+                                Repository.savingBlobCWD(file);
+                                break;
+                            }
+                        }
+                        search = search.getParent();
+                    }
+                    if(search == null){
+                        System.out.println("No commit with that id exists.");
+                    }
+                }
+                /** java gitlet.Main checkout [branch name] */
+                else{
+                    File whereBranch = join(Repository.GITLET_DIR , "branch");
+                    String[] branchHere = whereBranch.list();
+                    List<String> Branches = new ArrayList<>();
+                    for (String item : branchHere) {
+                        File branchNow = join(whereBranch , item);
+                        List<String> branch = plainFilenamesIn(branchNow);
+                        for(String one : branch){
+                            Branch branchItem = readObject(join(branchNow , one) , Branch.class);
+                            if(!branchItem.name.equals(nowBranch3.name))
+                                Branches.add(branchItem.name);
+                        }
+                    }
+                    sort(Branches);
+                    for(String item : Branches){
+                        System.out.println(item);
+                    }
+                    System.out.println();
+                }
                 break;
             default:
                 System.out.println("No command with that name exists.");

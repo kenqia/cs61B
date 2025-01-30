@@ -46,23 +46,10 @@ public class Repository {
     public static void add(String name){
         /** 获取要add的文件路径 */
         File theFile = join(CWD , name);
-        /** 主目录是否存在 */
-        if(!theFile.exists()) {
-            /** 换个目录 */
-            String[] fileHere = CWD.list();
-            for (String item : fileHere) {
-                if (join(CWD, item).isDirectory()) {
-                    theFile = join(join(CWD, item), name);
-                    if (theFile.exists()) {
-                        break;
-                    }
-                }
-            }
             if(!theFile.exists()) {
                 System.out.println("File does not exist.");
                 System.exit(0);
             }
-        }
         /**获取文件 内容 hashcode */
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(readContents(theFile));
@@ -129,6 +116,16 @@ public class Repository {
             throw new RuntimeException(e);
         }
         writeObject(join(join(whereAdding, index), hashCode.substring(2)) , root);
+    }
+
+    public static void savingBlobCWD(Blobs.Blob x){
+        try {
+            if (!join(CWD , x.getName()).exists())
+                join(CWD , x.getName()).createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(join(CWD , x.getName()) , Blobs.getContents(x));
     }
 
 

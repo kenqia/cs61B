@@ -18,7 +18,7 @@ public class Blobs implements Serializable {
         return root;
     }
 
-    /** 把指定Blob的信息(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
+    /** 把指定Blob的contents(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
     public void savingBlob(Blob bro , String contents){
 
         String code = bro.hashCode;
@@ -228,6 +228,7 @@ public class Blobs implements Serializable {
         private Blob left;
         private Blob right;
         private String color;
+        private File path;
 
         public Blob(String code, Blob left, Blob right, String color , String name) {
             this.hashCode = code;
@@ -235,6 +236,10 @@ public class Blobs implements Serializable {
             this.right = right;
             this.color = color;
             this.name = name;
+        }
+
+        public String getName(){
+            return this.name;
         }
 
     }
