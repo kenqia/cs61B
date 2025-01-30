@@ -240,14 +240,14 @@ public class Main {
                 else if(args[2].equals("--")){
                     /** 遍历搜索  */
                     Commit search = nowBranch4.HEAD;
-                    while(search  != null ){
+                    while(search  != null){
                         if(search.getHashCode().equals(args[1])){
                             /** 文件不存在此commit中 */
                             if(!search.getBlob().searchExist(args[3])){
                                 System.out.println("File does not exist in that commit.");
                                 System.exit(0);
                             }
-                            /** 存在file 存储到CWD */
+                            /** 存在file 存储 */
                             else{
                                 Blobs.Blob file = search.getBlob().search(args[3]);
                                 Repository.savingBlobCWD(file);
@@ -262,23 +262,26 @@ public class Main {
                 }
                 /** java gitlet.Main checkout [branch name] */
                 else{
-                    File whereBranch = join(Repository.GITLET_DIR , "branch");
-                    String[] branchHere = whereBranch.list();
-                    List<String> Branches = new ArrayList<>();
-                    for (String item : branchHere) {
-                        File branchNow = join(whereBranch , item);
+                    if(args[1].equals(nowBranch4.name)){
+                        System.out.println("No need to checkout the current branch.");
+                        System.exit(0);
+                    }
+                    File whereBranch1 = join(Repository.GITLET_DIR , "branch");
+                    String[] branchHere1 = whereBranch1.list();
+                    List<String> Branches1 = new ArrayList<>();
+                    for (String item : branchHere1) {
+                        File branchNow = join(whereBranch1 , item);
                         List<String> branch = plainFilenamesIn(branchNow);
                         for(String one : branch){
                             Branch branchItem = readObject(join(branchNow , one) , Branch.class);
-                            if(!branchItem.name.equals(nowBranch3.name))
-                                Branches.add(branchItem.name);
+                            if(branchItem.name.equals(args[1])){
+
+                            }
+
                         }
                     }
-                    sort(Branches);
-                    for(String item : Branches){
-                        System.out.println(item);
-                    }
-                    System.out.println();
+                    System.out.println("No such branch exists.");
+                    System.exit(0);
                 }
                 break;
             default:

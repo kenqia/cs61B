@@ -51,7 +51,6 @@ public class Blobs implements Serializable {
                 return;
             }
             bro.hashCode = code;
-            return;
         }else{
             /** 没有 则添加 */
             add(code , name , contents);
@@ -228,7 +227,6 @@ public class Blobs implements Serializable {
         private Blob left;
         private Blob right;
         private String color;
-        private File path;
 
         public Blob(String code, Blob left, Blob right, String color , String name) {
             this.hashCode = code;
