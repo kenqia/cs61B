@@ -59,7 +59,7 @@ public class Repository {
             }
         /**获取文件 内容 hashcode */
             String contents = readContentsAsString(theFile);
-            String hashCode = sha1(readContents(theFile) + name);
+            String hashCode = sha1(contents + name);
             /** 检查当前commit的文件 , 先获取其Blobs*/
             Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();

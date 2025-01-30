@@ -18,14 +18,19 @@ public class Blobs implements Serializable {
         return root;
     }
 
+    public static Blob clone(Blob x){
+        return x;
+    }
+
     /** 把指定Blob的contents(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
     public void savingBlob(Blob bro , String contents){
-
+        /** 判断是否为移除操作 */
+        if(bro.hashCode.equals("0000000000000000000000000000000000000000")) return;
         String code = bro.hashCode;
         /** 存储 */
         String index = code.substring(0 , 2);
         File whereSaving = join(Repository.GITLET_DIR , "objects");
-        join(whereSaving , index).mkdir();
+        join(whereSaving , index).mkdirs();
         try {
             if (!join(join(whereSaving, index), code.substring(2)).exists())
                 join(join(whereSaving, index), code.substring(2)).createNewFile();
@@ -40,12 +45,10 @@ public class Blobs implements Serializable {
     public void checkBlobs(String code , String name , String contents){
         /** 若有相同名字 ， 则覆盖 */
         if(searchExist(name)){
+            removeBlob(name);
+            add(code , name , contents);
             Blob bro = search(name);
-            /** 判断是否为移除操作 */
-            if(!code.equals("0000000000000000000000000000000000000000")){
                 savingBlob(bro , contents);
-            }
-            bro.hashCode = code;
         }else{
             /** 没有 则添加 */
             add(code , name , contents);
@@ -85,7 +88,7 @@ public class Blobs implements Serializable {
     public void add(String code , String name , String contents) {
         if (this.root == null){
             root = new Blob(code, null, null, "BLACK" , name);
-            if(!(contents == null)) savingBlob(root , contents);
+            savingBlob(root , contents);
         }
         else this.root = addidk(this.root, code , name , contents);
         if (root != null) {
@@ -96,7 +99,7 @@ public class Blobs implements Serializable {
     private Blob addidk(Blob node, String code , String name , String contents) {
         if (node == null) {
             Blob sister = new Blob(code, null, null, "RED" , name);
-            if(!(contents == null)) savingBlob(root , contents);
+             savingBlob(root , contents);
             return sister;
         }
         int cmp = name.compareTo(node.name);
@@ -242,6 +245,11 @@ public class Blobs implements Serializable {
 
         public String getHashCode(){
             return this.hashCode;
+        }
+
+        /** 不包含路径的名字 */
+        public String getTruename(){
+            return this.name.substring(this.name.lastIndexOf("/")+1);
         }
 
     }

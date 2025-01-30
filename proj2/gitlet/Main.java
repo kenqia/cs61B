@@ -90,7 +90,8 @@ public class Main {
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-                Blobs e = new Blobs(nowBranch.HEAD.getBlob().getRoot());
+                Branch nowBranchAnother = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Blobs e = new Blobs(nowBranchAnother.HEAD.getBlob().getRoot());
                 Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, e);
 
                 /** 新Commit 添加stage区数据 */

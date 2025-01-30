@@ -68,7 +68,7 @@ public class Commit implements Serializable {
 
     public void checkStage(){
         /** remake and add */
-        Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+        Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class);
         this.file = nowStage.check(this.getBlob());
     }
     /**把所有这个commit跟踪的有关路径的文件删除 */
