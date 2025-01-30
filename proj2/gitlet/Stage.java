@@ -139,6 +139,7 @@ public class Stage implements Serializable {
     public static String getContents(node x){
         String code = x.code;
         /** 存储 */
+        if(code.equals("0000000000000000000000000000000000000000")) return null;
         String index = code.substring(0 , 2);
         File whereAdding = join(GITLET_DIR , "stagingArea");
         return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
@@ -157,10 +158,7 @@ public class Stage implements Serializable {
                     order.add(x.name);
                 }
                 else{
-                    String[] removeItem = getContents(x).split("\n");
-                    for(String item : removeItem){
-                        removeOrder.add(item);
-                    }
+                    removeOrder.add(x.name);
                 }
                 x = x.next;
             }

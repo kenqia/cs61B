@@ -41,14 +41,9 @@ public class Blobs implements Serializable {
         /** 若有相同名字 ， 则覆盖 */
         if(searchExist(name)){
             Blob bro = search(name);
-            savingBlob(bro , contents);
             /** 判断是否为移除操作 */
-            if(code.equals("0000000000000000000000000000000000000000")){
-                String[] toRemove = contents.split("\n");
-                for(String item : toRemove){
-                    removeBlob(item);
-                }
-                return;
+            if(!code.equals("0000000000000000000000000000000000000000")){
+                savingBlob(bro , contents);
             }
             bro.hashCode = code;
         }else{
@@ -56,8 +51,6 @@ public class Blobs implements Serializable {
             add(code , name , contents);
         }
     }
-
-
     public Blob search(String name) {
         if (name == null) return null;
         else {
@@ -92,7 +85,7 @@ public class Blobs implements Serializable {
     public void add(String code , String name , String contents) {
         if (this.root == null){
             root = new Blob(code, null, null, "BLACK" , name);
-            savingBlob(root , contents);
+            if(!(contents == null)) savingBlob(root , contents);
         }
         else this.root = addidk(this.root, code , name , contents);
         if (root != null) {
@@ -103,7 +96,7 @@ public class Blobs implements Serializable {
     private Blob addidk(Blob node, String code , String name , String contents) {
         if (node == null) {
             Blob sister = new Blob(code, null, null, "RED" , name);
-            savingBlob(sister , contents);
+            if(!(contents == null)) savingBlob(root , contents);
             return sister;
         }
         int cmp = name.compareTo(node.name);
@@ -214,6 +207,7 @@ public class Blobs implements Serializable {
 
     public static String getContents(Blob x){
         String code = x.hashCode;
+        if (code.equals("0000000000000000000000000000000000000000")) return null;
         /** 存储 */
         String index = code.substring(0 , 2);
         File whereSaving = join(Repository.GITLET_DIR , "objects");
@@ -238,6 +232,16 @@ public class Blobs implements Serializable {
 
         public String getName(){
             return this.name;
+        }
+        public Blob getLeft(){
+            return this.left;
+        }
+        public Blob getRight(){
+            return this.right;
+        }
+
+        public String getHashCode(){
+            return this.hashCode;
         }
 
     }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 
+import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
 
@@ -69,6 +70,53 @@ public class Commit implements Serializable {
         /** remake and add */
         Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
         this.file = nowStage.check(this.getBlob());
+    }
+    /**把所有这个commit跟踪的有关路径的文件删除 */
+    public void delete(){
+        deleteTime(this.getBlob().getRoot());
+    }
+
+    private void deleteTime(Blobs.Blob x){
+        if(x == null) return;
+        join(CWD , x.getName()).delete();
+        deleteTime(x.getLeft());
+        deleteTime(x.getRight());
+    }
+    /** 检查一下这个commit要checkout过来的文件有没有被全部追踪 */
+    public void checkTrace(){
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+        checkTraceTime(this.getBlob().getRoot() , nowBranch);
+    }
+    public void checkTraceTime(Blobs.Blob x , Branch e){
+        if (x == null) return;
+        if(!e.HEAD.getBlob().searchExist(x.getName())){
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+        checkTraceTime(x.getLeft() , e);
+        checkTraceTime(x.getRight() , e);
+    }
+
+    /**把所有这个commit跟踪的有关文件导入进来*/
+    public void get(){
+        getTime(this.getBlob().getRoot());
+    }
+
+    private void getTime(Blobs.Blob x){
+        if(x == null) return;
+        try {
+            if (!join(CWD , x.getName()).exists()) {
+                if (x.getHashCode().equals("0000000000000000000000000000000000000000")) {
+                    return;
+                }
+                join(CWD, x.getName()).createNewFile();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(join(CWD , x.getName()) , Blobs.getContents(x));
+        getTime(x.getLeft());
+        getTime(x.getRight());
     }
 
 

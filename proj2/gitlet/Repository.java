@@ -36,6 +36,13 @@ public class Repository {
             join(GITLET_DIR , "commits").mkdir();
             join(GITLET_DIR , "stagingArea").mkdir();
             join(GITLET_DIR , "objects").mkdir();
+            /**存储删除信息 */
+            join(join(GITLET_DIR , "objects") , "00").mkdir();
+            try {
+                join(join(join(GITLET_DIR , "objects") , "00") , "00000000000000000000000000000000000000").createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             join(GITLET_DIR , "branch").mkdir();
         }else{
             System.out.println("A Gitlet version-control system already exists in the current directory.");
@@ -52,7 +59,7 @@ public class Repository {
             }
         /**获取文件 内容 hashcode */
             String contents = readContentsAsString(theFile);
-            String hashCode = sha1(readContents(theFile));
+            String hashCode = sha1(readContents(theFile) + name);
             /** 检查当前commit的文件 , 先获取其Blobs*/
             Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();
@@ -87,10 +94,10 @@ public class Repository {
 
     }
 
-    /**向Stage区储存remove信息 */
+    /**向Stage区储存remove信息 并删除文件*/
     public static void addRemove(String name){
         File whereAdding = join(GITLET_DIR , "stagingArea");
-
+        join(CWD , name).delete();
         if(!join(whereAdding , "00").exists()){
             join(whereAdding , "00").mkdir();
         }

@@ -270,16 +270,28 @@ public class Main {
                     String[] branchHere1 = whereBranch1.list();
                     List<String> Branches1 = new ArrayList<>();
                     for (String item : branchHere1) {
+                        int flag1 = 0;
                         File branchNow = join(whereBranch1 , item);
                         List<String> branch = plainFilenamesIn(branchNow);
                         for(String one : branch){
                             Branch branchItem = readObject(join(branchNow , one) , Branch.class);
                             if(branchItem.name.equals(args[1])){
-
+                                branchItem.HEAD.checkTrace();
+                                nowBranch4.HEAD.delete();
+                                branchItem.HEAD.get();
+                                writeObject(join(Repository.GITLET_DIR, "HeadBranch") , branchItem);
+                                flag1 = 1;
+                                break;
                             }
+                        }
+                        if(flag1 == 1){
+                            /**  重置 stage */
+                            writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
+                            System.exit(0);
 
                         }
                     }
+
                     System.out.println("No such branch exists.");
                     System.exit(0);
                 }
