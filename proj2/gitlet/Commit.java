@@ -97,6 +97,46 @@ public class Commit implements Serializable {
         checkTraceTime(x.getRight() , e);
     }
 
+    public void checkMerge(Branch.SplitPoint point){
+        /**先遍历看看Splitpoint的*/
+        file.root = checkMergeTime(point.getCommit().file.getRoot() ,this.getParentMerge() , this.getParent());
+        file.root = checksecordParent(this.getParentMerge().file.getRoot() ,this.getParentMerge() , this.getParent());
+        file.root = checkmainParent(point.getCommit().file.getRoot() ,this.getParentMerge() , this.getParent());
+    }
+
+    private Blobs.Blob checksecordParent(Blobs.Blob x , Commit secordParent , Commit mainParent){
+        if (x == null) return null;
+        x.left = checksecordParent(x.getLeft() , secordParent , mainParent);
+        x.right = checksecordParent(x.getRight() , secordParent , mainParent);
+
+        if()
+        return x;
+    }
+
+    private Blobs.Blob checkMergeTime(Blobs.Blob x , Commit secordParent , Commit mainParent){
+        if(x == null) return null;
+        x.left = checkMergeTime(x.getLeft() , secordParent , mainParent);
+        x.right = checkMergeTime(x.getRight() , secordParent , mainParent);
+        Blobs.Blob main = mainParent.file.search(x.getName());
+        Blobs.Blob secord = secordParent.file.search(x.getName());
+        /** 当前branch没变 given变了的Blob checkgiven */
+        if(x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())){
+            Repository.checkoutCommit(secordParent.hashCode , x.getName());
+            x.change(secord.getHashCode());
+        }
+        /** 当前branch变了 given没变 check 当前*/
+        else if(!x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())){
+            Repository.checkoutCommit(mainParent.hashCode , x.getName());
+            x.change(main.getHashCode());
+        }
+        /** 两个文件现在具有相同的内容或都已被删除 */
+        else if(secord.getHashCode().equals(main.getHashCode())){
+            Repository.checkoutCommit(mainParent.hashCode , x.getName());
+            x.change(main.getHashCode());
+        }
+        return x;
+    }
+
     /**把所有这个commit跟踪的有关文件导入进来*/
     public void get(){
         getTime(this.getBlob().getRoot());

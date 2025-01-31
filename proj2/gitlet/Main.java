@@ -244,64 +244,15 @@ public class Main {
                         Repository.savingBlobCWD(file);
                     }
                 }
+
                 /** java gitlet.Main checkout [commit id] -- [file name] */
                 else if(args[2].equals("--")){
-                    /** 遍历搜索  */
-                    Commit search = nowBranch4.HEAD;
-                    while(search  != null){
-                        if(search.getHashCode().equals(args[1])){
-                            /** 文件不存在此commit中 */
-                            if(!search.getBlob().searchExist(args[3])){
-                                System.out.println("File does not exist in that commit.");
-                                System.exit(0);
-                            }
-                            /** 存在file 存储 */
-                            else{
-                                Blobs.Blob file = search.getBlob().search(args[3]);
-                                Repository.savingBlobCWD(file);
-                                break;
-                            }
-                        }
-                        search = search.getParent();
-                    }
-                    if(search == null){
-                        System.out.println("No commit with that id exists.");
-                    }
+                    Repository.checkoutCommit(args[1] , args[3]);
                 }
                 /** java gitlet.Main checkout [branch name] */
+
                 else{
-                    if(args[1].equals(nowBranch4.name)){
-                        System.out.println("No need to checkout the current branch.");
-                        System.exit(0);
-                    }
-                    File whereBranch1 = join(Repository.GITLET_DIR , "branch");
-                    String[] branchHere1 = whereBranch1.list();
-                    List<String> Branches1 = new ArrayList<>();
-                    for (String item : branchHere1) {
-                        int flag1 = 0;
-                        File branchNow = join(whereBranch1 , item);
-                        List<String> branch = plainFilenamesIn(branchNow);
-                        for(String one : branch){
-                            Branch branchItem = readObject(join(branchNow , one) , Branch.class);
-                            if(branchItem.name.equals(args[1])){
-                                branchItem.HEAD.checkTrace();
-                                nowBranch4.HEAD.delete();
-                                branchItem.HEAD.get();
-                                writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , branchItem);
-                                flag1 = 1;
-                                break;
-                            }
-                        }
-                        if(flag1 == 1){
-                            /**  重置 stage */
-                            writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
-                            System.exit(0);
-
-                        }
-                    }
-
-                    System.out.println("No such branch exists.");
-                    System.exit(0);
+                   Repository.checkoutBranch(args[1]);
                 }
                 break;
             case "branch":
@@ -314,7 +265,10 @@ public class Main {
                 }
                 Branch nowBranch5 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 Branch newBranch = new Branch(args[1] , nowBranch5.HEAD);
+                newBranch.addMergeInfo(nowBranch5);
                 Repository.addBranch(newBranch);
+                nowBranch5.addMergeInfo(newBranch);
+                Repository.addBranch(nowBranch5);
                 break;
             case "rm-branch":
                 if(args.length != 2){
@@ -331,6 +285,7 @@ public class Main {
                 Repository.removeBranch(Repository.searchBranch(args[1]));
                 break;
             case "reset":
+                Branch nowBranch7 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 if(args.length != 2){
                     System.exit(0);
                 }
@@ -341,15 +296,53 @@ public class Main {
                 else {
                     Commit w = Repository.searchCommit(args[1]);
                     w.checkTrace();
-                    w.delete();
+                    nowBranch7.HEAD.delete();
                     w.get();
-                    Branch nowBranch7 = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class);
                     nowBranch7.HEAD = w;
                     Repository.addBranch(nowBranch7);
                     writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , nowBranch7);
                     writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
                     System.exit(0);
                 }
+                break;
+            case "merge":
+                /** 参数数量不对 */
+                if(args.length != 2){
+                    System.exit(0);
+                }
+                Branch nowBranch8 = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class);
+                Branch theGivenBranch = Repository.searchBranch(args[1]);
+                /** 不能merge自己 */
+                if(args[1].equals(nowBranch8.name)) {
+                    System.out.println("Cannot merge a branch with itself.");
+                    System.exit(0);
+                }
+                /** 不存在这个Branch */
+                if(!Repository.searchBranchExist(args[1])){
+                    System.out.println("A branch with that name does not exist.");
+                    System.exit(0);
+                }
+                Branch.SplitPoint point = nowBranch8.getPoint(theGivenBranch);
+                /** 如果 split point 与给定分支的提交相同 */
+                if(theGivenBranch.HEAD.getHashCode().equals(point.getCommitCode())){
+                    System.out.println("Given branch is an ancestor of the current branch.");
+                    System.exit(0);
+                }
+                /** if the split point is the current branch，那么效果是检出给定的分支 */
+                if(nowBranch8.HEAD.getHashCode().equals(point.getCommitCode())) {
+                    /** java gitlet.Main checkout [branch name] */
+                               Repository.checkoutBranch(theGivenBranch);
+                }
+                /** 获取 时间数据 */
+                Date dateNow = new Date();
+                SimpleDateFormat formatterNow = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z", Locale.ENGLISH);
+
+                /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
+                Blobs h = new Blobs(nowBranch8.HEAD.getBlob().getRoot());
+                Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), "1111"), nowBranch8.HEAD, theGivenBranch.HEAD, h);
+                mergeCommit.checkMerge(point);
+
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 break;

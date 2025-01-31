@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static gitlet.Main.*;
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -63,7 +64,7 @@ public class Repository {
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(contents + name);
             /** 检查当前commit的文件 , 先获取其Blobs*/
-            Branch nowBranch = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class );
+            Branch nowBranch = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();
             /** 存储路径 */
             String index = hashCode.substring(0 , 2);
@@ -78,12 +79,12 @@ public class Repository {
                 System.exit(0);
             }
             /** 更新存储区文件内容 */
-            Stage nowStage = readObject(join(Repository.GITLET_DIR , Main.STAGEFILE) , Stage.class );
+            Stage nowStage = readObject(join(Repository.GITLET_DIR , STAGEFILE) , Stage.class );
             if(nowStage.isExist(name)){
                nowStage.remove(name);
             }
             nowStage.add(hashCode , name);
-            writeObject(join(Repository.GITLET_DIR, Main.STAGEFILE) , nowStage);
+            writeObject(join(Repository.GITLET_DIR, STAGEFILE) , nowStage);
 
             /** add File 到存储区*/
             join(whereAdding , index).mkdir();
@@ -210,5 +211,79 @@ public class Repository {
         writeContents(join(CWD , x.getName()) , Blobs.getContents(x));
     }
 
+    public static void checkoutCommit(String ID , String name){
+        if(ID.equals(ZERO)) return;
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
+        /** 遍历搜索  */
+        Commit search = nowBranch.HEAD;
+        while(search  != null){
+            if(search.getHashCode().equals(ID)){
+                /** 文件不存在此commit中 */
+                if(!search.getBlob().searchExist(name)){
+                    System.out.println("File does not exist in that commit.");
+                    System.exit(0);
+                }
+                /** 存在file 存储 */
+                else{
+                    Blobs.Blob file = search.getBlob().search(ID);
+                    Repository.savingBlobCWD(file);
+                    break;
+                }
+            }
+            search = search.getParent();
+        }
+        if(search == null){
+            System.out.println("No commit with that id exists.");
+        }
+    }
 
+    public static void checkoutBranch(String name){
+            Branch nowBranch = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
+            if(name.equals(nowBranch.name)){
+                System.out.println("No need to checkout the current branch.");
+                System.exit(0);
+            }
+            File whereBranch1 = join(Repository.GITLET_DIR , "branch");
+            String[] branchHere1 = whereBranch1.list();
+            List<String> Branches1 = new ArrayList<>();
+            for (String item : branchHere1) {
+                int flag1 = 0;
+                File branchNow = join(whereBranch1 , item);
+                List<String> branch = plainFilenamesIn(branchNow);
+                for(String one : branch){
+                    Branch branchItem = readObject(join(branchNow , one) , Branch.class);
+                    if(branchItem.name.equals(name)){
+                        branchItem.HEAD.checkTrace();
+                        nowBranch.HEAD.delete();
+                        branchItem.HEAD.get();
+                        writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , branchItem);
+                        flag1 = 1;
+                        break;
+                    }
+                }
+                if(flag1 == 1){
+                    /**  重置 stage */
+                    writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
+                    System.exit(0);
+
+                }
+            }
+
+            System.out.println("No such branch exists.");
+            System.exit(0);
+    }
+
+    public static void checkoutBranch(Branch x){
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
+        if(x.name.equals(nowBranch.name)){
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+        x.HEAD.checkTrace();
+        nowBranch.HEAD.delete();
+        x.HEAD.get();
+        writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , x);
+        /**  重置 stage */
+        writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
+    }
 }

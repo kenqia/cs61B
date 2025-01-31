@@ -8,7 +8,7 @@ import static gitlet.Utils.*;
 
 /** Blobs 是存储Blob的LLRB树 , Blob 是存储文件信息的类 */
 public class Blobs implements Serializable {
-    private Blob root; /** Top Blob */
+    public Blob root; /** Top Blob */
 
     public Blobs(Blob root){
         this.root = root;
@@ -222,8 +222,8 @@ public class Blobs implements Serializable {
     public class Blob implements Serializable {
         private String hashCode;
         private String name;
-        private Blob left;
-        private Blob right;
+        public Blob left;
+        public Blob right;
         private String color;
 
         public Blob(String code, Blob left, Blob right, String color , String name) {
@@ -251,6 +251,10 @@ public class Blobs implements Serializable {
         /** 不包含路径的名字 */
         public String getTruename(){
             return this.name.substring(this.name.lastIndexOf("/")+1);
+        }
+
+        public void change(String code){
+            this.hashCode = code;
         }
 
     }
