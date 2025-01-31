@@ -316,6 +316,21 @@ public class Main {
                 Branch newBranch = new Branch(args[1] , nowBranch5.HEAD);
                 Repository.addBranch(newBranch);
                 break;
+            case "rm-branch":
+                if(args.length != 2){
+                    System.exit(0);
+                }
+                Branch nowBranch6 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
+                if(args[1].equals(nowBranch6.name)){
+                    System.out.println("Cannot remove the current branch.");
+                }
+                if(!Repository.searchBranchExist(args[1])){
+                    System.out.println("A branch with that name does not exist.");
+                    System.exit(0);
+                }
+                Repository.removeBranch(Repository.searchBranch(args[1]));
+                break;
+            case "reset":
             default:
                 System.out.println("No command with that name exists.");
                 break;

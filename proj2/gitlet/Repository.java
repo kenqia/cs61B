@@ -144,6 +144,30 @@ public class Repository {
         return false;
     }
 
+    public static Branch searchBranch(String name) {
+        File whereBranch = join(Repository.GITLET_DIR, "branch");
+        String[] branchHere = whereBranch.list();
+        for (String item : branchHere) {
+            File branchNow = join(whereBranch, item);
+            List<String> branch = plainFilenamesIn(branchNow);
+            for (String one : branch) {
+                Branch branchItem = readObject(join(branchNow, one), Branch.class);
+                if (branchItem.name.equals(name)) {
+                    return branchItem;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void removeBranch(Branch x){
+        String hashCode = x.code;
+        File whereRemove = join(GITLET_DIR , "branch");
+        String index = x.code.substring(0 , 2);
+        join(join(whereRemove, index), hashCode.substring(2)).delete();
+        join(whereRemove , index).delete();
+    }
+
     public static void savingBlobCWD(Blobs.Blob x){
         try {
             if (!join(CWD , x.getName()).exists())
