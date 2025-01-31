@@ -74,10 +74,16 @@ public class Main {
 
                 break;
             case "commit":
+
                 if(args.length == 1) {
                     System.out.println("Please enter a commit message.");
                     System.exit(0);
                 }
+                if(args[1].equals("")){
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
+                }
+
                 /** 检查是否init */
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
                 /** 检查是否add */
