@@ -2,6 +2,8 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static gitlet.Utils.*;
 
@@ -124,6 +126,22 @@ public class Repository {
             throw new RuntimeException(e);
         }
         writeObject(join(join(whereAdding, index), hashCode.substring(2)) , root);
+    }
+
+    public static boolean searchBranchExist(String name) {
+        File whereBranch = join(Repository.GITLET_DIR, "branch");
+        String[] branchHere = whereBranch.list();
+        for (String item : branchHere) {
+            File branchNow = join(whereBranch, item);
+            List<String> branch = plainFilenamesIn(branchNow);
+            for (String one : branch) {
+                Branch branchItem = readObject(join(branchNow, one), Branch.class);
+                if (branchItem.name.equals(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void savingBlobCWD(Blobs.Blob x){

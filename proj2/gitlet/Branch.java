@@ -11,4 +11,10 @@ public class Branch implements Serializable {
         this.code = Utils.sha1(name);
     }
 
+    public Branch(String name , Commit root){
+        this.name = name;
+        this.code = Utils.sha1(name);
+        this.HEAD = root;
+    }
+
 }

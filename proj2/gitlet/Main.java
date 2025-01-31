@@ -304,6 +304,18 @@ public class Main {
                     System.exit(0);
                 }
                 break;
+            case "branch":
+                if(args.length != 2){
+                    System.exit(0);
+                }
+                if(Repository.searchBranchExist(args[1])){
+                    System.out.println("A branch with that name already exists.");
+                    System.exit(0);
+                }
+                Branch nowBranch5 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
+                Branch newBranch = new Branch(args[1] , nowBranch5.HEAD);
+                Repository.addBranch(newBranch);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 break;
