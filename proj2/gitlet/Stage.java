@@ -139,7 +139,7 @@ public class Stage implements Serializable {
     public static String getContents(node x){
         String code = x.code;
         /** 存储 */
-        if(code.equals("0000000000000000000000000000000000000000")) return null;
+        if(code.equals(Main.ZERO)) return null;
         String index = code.substring(0 , 2);
         File whereAdding = join(GITLET_DIR , "stagingArea");
         return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
@@ -155,7 +155,7 @@ public class Stage implements Serializable {
             node x = head[i].next;
             while (x != null) {
                 /** 拒绝add remove的stage信息*/
-                if(!x.code.equals("0000000000000000000000000000000000000000")) {
+                if(!x.code.equals(Main.ZERO)) {
                     order.add(x.name);
                 }
                 else{

@@ -61,7 +61,7 @@ public class Repository {
             String contents = readContentsAsString(theFile);
             String hashCode = sha1(contents + name);
             /** 检查当前commit的文件 , 先获取其Blobs*/
-            Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+            Branch nowBranch = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class );
             Blobs find = nowBranch.HEAD.getBlob();
             /** 存储路径 */
             String index = hashCode.substring(0 , 2);
@@ -76,12 +76,12 @@ public class Repository {
                 System.exit(0);
             }
             /** 更新存储区文件内容 */
-            Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+            Stage nowStage = readObject(join(Repository.GITLET_DIR , Main.STAGEFILE) , Stage.class );
             if(nowStage.isExist(name)){
                nowStage.remove(name);
             }
             nowStage.add(hashCode , name);
-            writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage);
+            writeObject(join(Repository.GITLET_DIR, Main.STAGEFILE) , nowStage);
 
             /** add File 到存储区*/
             join(whereAdding , index).mkdir();

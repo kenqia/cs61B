@@ -60,15 +60,15 @@ public class Commit implements Serializable {
         writeObject(join(join(whereCommiting, index), this.hashCode.substring(2)) , this );
 
         /** 更改HEADBRANCH 文件信息*/
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class );
         nowBranch.HEAD = this;
         Repository.addBranch(nowBranch);
-        writeObject(join(Repository.GITLET_DIR , "HeadBranch") , nowBranch);
+        writeObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , nowBranch);
     }
 
     public void checkStage(){
         /** remake and add */
-        Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class);
+        Stage nowStage = readObject(join(Repository.GITLET_DIR , Main.STAGEFILE) , Stage.class);
         this.file = nowStage.check(this.getBlob());
     }
     /**把所有这个commit跟踪的有关路径的文件删除 */
@@ -84,7 +84,7 @@ public class Commit implements Serializable {
     }
     /** 检查一下这个commit要checkout过来的文件有没有被全部追踪 */
     public void checkTrace(){
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class );
         checkTraceTime(this.getBlob().getRoot() , nowBranch);
     }
     public void checkTraceTime(Blobs.Blob x , Branch e){
@@ -106,7 +106,7 @@ public class Commit implements Serializable {
         if(x == null) return;
         try {
             if (!join(CWD , x.getName()).exists()) {
-                if (x.getHashCode().equals("0000000000000000000000000000000000000000")) {
+                if (x.getHashCode().equals(Main.ZERO)) {
                     return;
                 }
                 join(CWD, x.getName()).createNewFile();

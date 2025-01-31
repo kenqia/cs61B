@@ -20,6 +20,9 @@ import static java.util.Collections.sort;
  */
 public class Main {
 
+    static final String STAGEFILE = "StageFile";
+    static final String HEADBRANCH = "HeadBranch";
+    static final String ZERO = "0000000000000000000000000000000000000000";
     /**
      * Usage: java gitlet.Main ARGS, where ARGS contains
      * <COMMAND> <OPERAND1> <OPERAND2> ...
@@ -39,15 +42,15 @@ public class Main {
 
                 /** 创建信息储存文件*/
                 try {
-                    join(Repository.GITLET_DIR, "HeadBranch").createNewFile(); /**存储 头Branch是谁*/
-                    join(Repository.GITLET_DIR, "StageFile").createNewFile();  /**存储 ？？*/
+                    join(Repository.GITLET_DIR, HEADBRANCH).createNewFile(); /**存储 头Branch是谁*/
+                    join(Repository.GITLET_DIR, STAGEFILE).createNewFile();  /**存储 ？？*/
                 }catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 /** 新建存储文件信息 */
-                writeObject(join(Repository.GITLET_DIR, "HeadBranch") , new Branch("master"));
-                writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
+                writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , new Branch("master"));
+                writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
                 /** 为init创建commit */
                 if(args.length != 1) {
                     Commit init = new Commit(new Metadata("Wed Dec 31 16:00:00 1969 -0800", args[1]), null, null, new Blobs(null));
@@ -78,7 +81,7 @@ public class Main {
                 /** 检查是否init */
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
                 /** 检查是否add */
-                Stage nowStage = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+                Stage nowStage = readObject(join(Repository.GITLET_DIR , STAGEFILE) , Stage.class );
                 if(nowStage.getSize() == 0){
                     System.out.println("No changes added to the commit.");
                     System.exit(0);
@@ -89,7 +92,7 @@ public class Main {
                 SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z", Locale.ENGLISH);
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
-                Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Branch nowBranch = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 Blobs e = new Blobs(nowBranch.HEAD.getBlob().getRoot());
                 Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, e);
 
@@ -98,7 +101,7 @@ public class Main {
 
                 wantToCommit.loadingCommit();
                 /**  重置 stage */
-                writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
+                writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
                 break;
             /** 删除 */
             case "rm":
@@ -109,18 +112,18 @@ public class Main {
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
 
                 /** 取消暂存文件 */
-                Stage nowStage1 = readObject(join(Repository.GITLET_DIR , "StageFile") , Stage.class );
+                Stage nowStage1 = readObject(join(Repository.GITLET_DIR , STAGEFILE) , Stage.class );
                 if(nowStage1.isExist(args[1])){
                     nowStage1.removeStage(args[1]);
-                    writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage1);
+                    writeObject(join(Repository.GITLET_DIR, STAGEFILE) , nowStage1);
                     System.exit(0);
                 }
                 /** 添加删除信息 */
-                Branch nowBranch1 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Branch nowBranch1 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 if(nowBranch1.HEAD.getBlob().searchExist(args[1])){
                     Repository.addRemove(args[1]);
-                    nowStage1.add("0000000000000000000000000000000000000000" , args[1] );
-                    writeObject(join(Repository.GITLET_DIR, "StageFile") , nowStage1);
+                    nowStage1.add(ZERO , args[1] );
+                    writeObject(join(Repository.GITLET_DIR, STAGEFILE) , nowStage1);
                 }else{
                     System.out.println("No reason to remove the file.");
                     System.exit(0);
@@ -129,7 +132,7 @@ public class Main {
             /** 日志 */
             case "log":
                 if(!Repository.GITLET_DIR.exists()) System.exit(0);
-                Branch nowBranch2 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Branch nowBranch2 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 Commit x = nowBranch2.HEAD;
                 /**递归遍历commit内容 */
                 while (x != null){
@@ -188,7 +191,7 @@ public class Main {
 
                 /** 遍历branch目录获取信息 打印branch信息 */
                 System.out.println("=== Branches ===");
-                Branch nowBranch3 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Branch nowBranch3 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 File whereBranch = join(Repository.GITLET_DIR , "branch");
                 String[] branchHere = whereBranch.list();
                 List<String> Branches = new ArrayList<>();
@@ -208,7 +211,7 @@ public class Main {
                 System.out.println();
 
                 /** 遍历stage文件 打印已stage文件信息  remove信息也在里面了*/
-                Stage nowStage2 = readObject(join(Repository.GITLET_DIR , "stageFile") , Stage.class);
+                Stage nowStage2 = readObject(join(Repository.GITLET_DIR , STAGEFILE) , Stage.class);
                 nowStage2.printInfo();
                 /** 另外两个状态 先留着*/
                 System.out.println("=== Modifications Not Staged For Commit ===");
@@ -218,8 +221,9 @@ public class Main {
                 break;
             /** 转入到 */
             case "checkout":
-                Branch nowBranch4 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
+                Branch nowBranch4 = readObject(join(Repository.GITLET_DIR , HEADBRANCH) , Branch.class );
                 if(args.length == 1) System.exit(0);
+
                 /** 第一种java gitlet.Main checkout -- [file name] */
                 else if (args[1].equals("--")){
                     Blobs head = nowBranch4.HEAD.getBlob();
@@ -277,14 +281,14 @@ public class Main {
                                 branchItem.HEAD.checkTrace();
                                 nowBranch4.HEAD.delete();
                                 branchItem.HEAD.get();
-                                writeObject(join(Repository.GITLET_DIR, "HeadBranch") , branchItem);
+                                writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , branchItem);
                                 flag1 = 1;
                                 break;
                             }
                         }
                         if(flag1 == 1){
                             /**  重置 stage */
-                            writeObject(join(Repository.GITLET_DIR, "StageFile") , new Stage(10));
+                            writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
                             System.exit(0);
 
                         }

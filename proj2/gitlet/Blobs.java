@@ -25,7 +25,7 @@ public class Blobs implements Serializable {
     /** 把指定Blob的contents(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
     public void savingBlob(Blob bro , String contents){
         /** 判断是否为移除操作 */
-        if(bro.hashCode.equals("0000000000000000000000000000000000000000")) return;
+        if(bro.hashCode.equals(Main.ZERO)) return;
         String code = bro.hashCode;
         /** 存储 */
         String index = code.substring(0 , 2);
@@ -211,7 +211,7 @@ public class Blobs implements Serializable {
 
     public static String getContents(Blob x){
         String code = x.hashCode;
-        if (code.equals("0000000000000000000000000000000000000000")) return null;
+        if (code.equals(Main.ZERO)) return null;
         /** 存储 */
         String index = code.substring(0 , 2);
         File whereSaving = join(Repository.GITLET_DIR , "objects");
