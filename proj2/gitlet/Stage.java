@@ -1,11 +1,9 @@
 package gitlet;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import static gitlet.Repository.GITLET_DIR;
 import static gitlet.Utils.*;
@@ -28,17 +26,19 @@ public class Stage implements Serializable {
     public void add(String code , String name) {
         int index = Math.abs(code.hashCode()) % head.length;
         node adding = new node(null, code , name);
-        addlast(head[index], adding);
+        head[index] = addlast(head[index], adding);
         head[index].size++;
         if(this.head[index].size == 1) this.size++;
         check(this.size, head[index].size);
     }
 
-    private void addlast(node head, node hehe) {
-        while (head.next != null) {
-            head = head.next;
+    private node addlast(node head, node hehe) {
+        node x = head;
+        while (x.next != null) {
+            x = x.next;
         }
-        head.next = hehe;
+        x.next = hehe;
+        return head;
     }
 
     /** 检查 比例 调整大小 */
@@ -49,8 +49,7 @@ public class Stage implements Serializable {
     }
 
     private void resize() {
-        Stage one = new Stage(2 * size);
-        one.size = 0;
+        Stage one = new Stage(2 * this.size);
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
@@ -64,6 +63,7 @@ public class Stage implements Serializable {
     public node[] getHead(){
         return this.head;
     }
+
     /** commit操作中 遍历存储区 执行操作 */
     public Blobs check(Blobs Trees){
         for (int i = 0; i < this.head.length; i++) {
@@ -124,7 +124,7 @@ public class Stage implements Serializable {
                     this.head[i].size--;
                     if(this.head[i].size == 0) this.size--;
                     return x;
-                };
+                }
                 x = x.next;
                 ptr = ptr.next;
             }
@@ -150,6 +150,7 @@ public class Stage implements Serializable {
         System.out.println("=== Staged Files ===");
         List<String> removeOrder = new ArrayList<>();
         List<String> order = new ArrayList<>();
+
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {

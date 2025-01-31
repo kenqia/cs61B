@@ -68,10 +68,11 @@ public class Repository {
             File whereAdding = join(GITLET_DIR , "stagingArea");
             /** 检查当前commit的文件 所add文件是否已存在当前commit*/
             if(find != null && find.searchExist(name) && (Blobs.getContents(find.search(name)).equals(contents))){
-                    if (join(join(whereAdding, index), hashCode.substring(2)).exists())
+                    if (join(join(whereAdding, index), hashCode.substring(2)).exists()){
                         /** 存在就删掉 */
                         join(join(whereAdding , index), hashCode.substring(2)).delete();
                         join(whereAdding , index).delete();
+                    }
                 System.exit(0);
             }
             /** 更新存储区文件内容 */

@@ -87,7 +87,7 @@ public class Blobs implements Serializable {
 
     public void add(String code , String name , String contents) {
         if (this.root == null){
-            root = new Blob(code, null, null, "BLACK" , name);
+            this.root = new Blob(code, null, null, "BLACK" , name);
             savingBlob(root , contents);
         }
         else this.root = addidk(this.root, code , name , contents);
@@ -112,7 +112,7 @@ public class Blobs implements Serializable {
         } else if (isRed(node.left) && isRed(node.left.left)) {
             node = rotateRight(node);
         } else if (isRed(node.right) && isRed(node.left)) {
-            filpColor(node);
+            node = filpColor(node);
         }
         return node;
     }
@@ -135,11 +135,12 @@ public class Blobs implements Serializable {
         return x;
     }
 
-    private void filpColor(Blob node) {
+    private Blob filpColor(Blob node) {
         if (node.color.equals("RED")) node.color = "BLACK";
         else node.color = "RED";
         if (node.left != null) node.left.color = "BLACK";
         if (node.right != null) node.right.color = "BLACK";
+        return  node;
     }
 
     private boolean isRed(Blob node){
@@ -176,7 +177,7 @@ public class Blobs implements Serializable {
         } else if (isRed(root.left) && isRed(root.left.left)) {
             root = rotateRight(root);
         } else if (isRed(root.right) && isRed(root.left)) {
-            filpColor(root);
+            root = filpColor(root);
         }
         return root;
         
@@ -187,7 +188,7 @@ public class Blobs implements Serializable {
             root.hashCode = root.left.right.hashCode;
             root.name = root.left.right.name;
             if(root.left.right.left == null && root.left.right.right == null){
-                root.left.right=null;
+                root.left.right = null;
             }
             else{
                 if(root.left.right.left != null) root.left.right = root.left.right.left;
@@ -199,7 +200,7 @@ public class Blobs implements Serializable {
             root.hashCode = root.left.hashCode;
             root.name = root.left.name;
             if(root.left.left == null){
-                root.left=null;
+                root.left = null;
             }
             else{
                 root.left = root.left.left;

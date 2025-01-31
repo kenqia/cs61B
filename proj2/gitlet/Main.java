@@ -90,8 +90,7 @@ public class Main {
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Branch nowBranch = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-                Branch nowBranchAnother = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-                Blobs e = new Blobs(nowBranchAnother.HEAD.getBlob().getRoot());
+                Blobs e = new Blobs(nowBranch.HEAD.getBlob().getRoot());
                 Commit wantToCommit = new Commit(new Metadata(formatter.format(date), args[1]), nowBranch.HEAD, null, e);
 
                 /** 新Commit 添加stage区数据 */
@@ -142,7 +141,6 @@ public class Main {
                     System.out.println();
                     x = x.getParent();
                 }
-
                 break;
              /** 全局日志 */
             case "global-log":
@@ -175,7 +173,7 @@ public class Main {
                     List<String> commit = plainFilenamesIn(commitNow);
                     for(String one : commit){
                         Commit commitItem = readObject(join(commitNow , one ) , Commit.class);
-                        if(commitItem.metadata.logMessage == args[1]){
+                        if(commitItem.metadata.logMessage.equals(args[1])){
                             flag = 1;
                             System.out.println("commit " + commitItem.getHashCode());
                         }
@@ -191,7 +189,6 @@ public class Main {
                 /** 遍历branch目录获取信息 打印branch信息 */
                 System.out.println("=== Branches ===");
                 Branch nowBranch3 = readObject(join(Repository.GITLET_DIR , "HeadBranch") , Branch.class );
-                System.out.println("*" + nowBranch3.name);
                 File whereBranch = join(Repository.GITLET_DIR , "branch");
                 String[] branchHere = whereBranch.list();
                 List<String> Branches = new ArrayList<>();
@@ -200,12 +197,12 @@ public class Main {
                     List<String> branch = plainFilenamesIn(branchNow);
                     for(String one : branch){
                         Branch branchItem = readObject(join(branchNow , one) , Branch.class);
-                        if(!branchItem.name.equals(nowBranch3.name))
                         Branches.add(branchItem.name);
                     }
                 }
                 sort(Branches);
                 for(String item : Branches){
+                    if(item.equals(nowBranch3.name)) System.out.print("*");
                     System.out.println(item);
                 }
                 System.out.println();
