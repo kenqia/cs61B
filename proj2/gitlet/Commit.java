@@ -87,7 +87,7 @@ public class Commit implements Serializable {
         Branch nowBranch = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class );
         checkTraceTime(this.getBlob().getRoot() , nowBranch);
     }
-    public void checkTraceTime(Blobs.Blob x , Branch e){
+    private void checkTraceTime(Blobs.Blob x , Branch e){
         if (x == null) return;
         if(!e.HEAD.getBlob().searchExist(x.getName())){
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
@@ -135,4 +135,6 @@ public class Commit implements Serializable {
     public String getHashCode(){
         return this.hashCode;
     }
+
+
 }

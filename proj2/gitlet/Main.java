@@ -331,6 +331,25 @@ public class Main {
                 Repository.removeBranch(Repository.searchBranch(args[1]));
                 break;
             case "reset":
+                if(args.length != 2){
+                    System.exit(0);
+                }
+                if(!Repository.searchCommitExist(args[1])){
+                    System.out.println("No commit with that id exists.");
+                    System.exit(0);
+                }
+                else {
+                    Commit w = Repository.searchCommit(args[1]);
+                    w.checkTrace();
+                    w.delete();
+                    w.get();
+                    Branch nowBranch7 = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class);
+                    nowBranch7.HEAD = w;
+                    Repository.addBranch(nowBranch7);
+                    writeObject(join(Repository.GITLET_DIR, HEADBRANCH) , nowBranch7);
+                    writeObject(join(Repository.GITLET_DIR, STAGEFILE) , new Stage(10));
+                    System.exit(0);
+                }
             default:
                 System.out.println("No command with that name exists.");
                 break;

@@ -113,7 +113,7 @@ public class Repository {
         writeContents(join(join(whereAdding , "00") , "00000000000000000000000000000000000000") , readContentsAsString(join(join(whereAdding , "00") , "00000000000000000000000000000000000000")) + name + "\n");
     }
 
-    /** 存储一个Branch */
+    /** 存储或重写一个Branch */
     public static void addBranch(Branch root){
         String hashCode = root.code;
         File whereAdding = join(GITLET_DIR , "branch");
@@ -154,6 +154,38 @@ public class Repository {
                 Branch branchItem = readObject(join(branchNow, one), Branch.class);
                 if (branchItem.name.equals(name)) {
                     return branchItem;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean searchCommitExist(String code){
+        File whereCommit = join(Repository.GITLET_DIR, "commits");
+        String[] CommitHere = whereCommit.list();
+        for (String item : CommitHere) {
+            File commitNow = join(whereCommit, item);
+            List<String> commit = plainFilenamesIn(commitNow);
+            for (String one : commit) {
+                Commit commitItem = readObject(join(commitNow, one), Commit.class);
+                if (commitItem.getHashCode().equals(code)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static Commit searchCommit(String code){
+        File whereCommit = join(Repository.GITLET_DIR, "commits");
+        String[] CommitHere = whereCommit.list();
+        for (String item : CommitHere) {
+            File commitNow = join(whereCommit, item);
+            List<String> commit = plainFilenamesIn(commitNow);
+            for (String one : commit) {
+                Commit commitItem = readObject(join(commitNow, one), Commit.class);
+                if (commitItem.getHashCode().equals(code)) {
+                    return commitItem;
                 }
             }
         }
