@@ -58,8 +58,8 @@ public class Repository {
             if (x != null && x.getCode().equals(ZERO)) {
                 nowStage.remove(name);
                 removeRemove(name);
-                System.exit(0);
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), nowStage);
+                System.exit(0);
             }
             else {
                 System.out.println("File does not exist.");

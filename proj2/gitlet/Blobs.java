@@ -66,10 +66,10 @@ public class Blobs implements Serializable {
         /** 若有相同名字 ， 则覆盖 */
         if (searchExist(name)) {
             if(code.equals(ZERO)){
-                removeBlob(name);
+                this.removeBlob(name);
                 return;
             }
-            removeBlob(name);
+            this.removeBlob(name);
             add(code, name, contents);
             Blob bro = search(name);
             savingBlob(bro, contents);

@@ -121,7 +121,8 @@ public class Main {
                 /** 取消暂存文件 */
                 Stage nowStage1 = readObject(join(Repository.GITLET_DIR, STAGEFILE), Stage.class);
                 if (nowStage1.isExist(args[1])) {
-                    nowStage1.removeStage(args[1]);
+                    nowStage1.remove(args[1]);
+                    Repository.removeRemove(args[1]);
                     writeObject(join(Repository.GITLET_DIR, STAGEFILE), nowStage1);
                     System.exit(0);
                 }
@@ -267,10 +268,7 @@ public class Main {
                 }
                 Branch nowBranch5 = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
                 Branch newBranch = new Branch(args[1], nowBranch5.HEAD);
-                newBranch.addMergeInfo(nowBranch5);
                 Repository.addBranch(newBranch);
-                nowBranch5.addMergeInfo(newBranch);
-                Repository.addBranch(nowBranch5);
                 break;
             case "rm-branch":
                 if (args.length != 2) {
@@ -324,18 +322,18 @@ public class Main {
                     System.exit(0);
                 }
                 /** 不存在这个Branch */
-                if (!Repository.searchBranchExist(args[1])) {
+                if (theGivenBranch == null) {
                     System.out.println("A branch with that name does not exist.");
                     System.exit(0);
                 }
-                Branch.SplitPoint point = nowBranch8.getPoint(theGivenBranch);
+                Commit point = nowBranch8.getPoint(theGivenBranch);
                 /** 如果 split point 与给定分支的提交相同 */
-                if (theGivenBranch.HEAD.getHashCode().equals(point.getCommitCode())) {
+                if (theGivenBranch.HEAD.getHashCode().equals(point.getHashCode())) {
                     System.out.println("Given branch is an ancestor of the current branch.");
                     System.exit(0);
                 }
                 /** if the split point is the current branch，那么效果是检出给定的分支 */
-                if (nowBranch8.HEAD.getHashCode().equals(point.getCommitCode())) {
+                if (nowBranch8.HEAD.getHashCode().equals(point.getHashCode())) {
                     /** java gitlet.Main checkout [branch name] */
                     Repository.checkoutBranch(theGivenBranch);
                     System.out.println("Current branch fast-forwarded.");
