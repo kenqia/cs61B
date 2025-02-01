@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 
+import static gitlet.Main.ZERO;
 import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
@@ -99,42 +100,96 @@ public class Commit implements Serializable {
 
     public void checkMerge(Branch.SplitPoint point){
         /**先遍历看看Splitpoint的*/
-        file.root = checkMergeTime(point.getCommit().file.getRoot() ,this.getParentMerge() , this.getParent());
-        file.root = checksecordParent(this.getParentMerge().file.getRoot() ,this.getParentMerge() , this.getParent());
-        file.root = checkmainParent(point.getCommit().file.getRoot() ,this.getParentMerge() , this.getParent());
+        this.checkMergeTime(point.getCommit().file.getRoot() ,this.getParentMerge());
+        this.checkmainParent(this.getParent().file.getRoot() ,this.getParentMerge() , point.getCommit().file);
+        this.checksecordParent(this.getParentMerge().file.getRoot() ,this.getParentMerge() , point.getCommit().file);
     }
 
-    private Blobs.Blob checksecordParent(Blobs.Blob x , Commit secordParent , Commit mainParent){
-        if (x == null) return null;
-        x.left = checksecordParent(x.getLeft() , secordParent , mainParent);
-        x.right = checksecordParent(x.getRight() , secordParent , mainParent);
-
-        if()
-        return x;
-    }
-
-    private Blobs.Blob checkMergeTime(Blobs.Blob x , Commit secordParent , Commit mainParent){
-        if(x == null) return null;
-        x.left = checkMergeTime(x.getLeft() , secordParent , mainParent);
-        x.right = checkMergeTime(x.getRight() , secordParent , mainParent);
-        Blobs.Blob main = mainParent.file.search(x.getName());
+    private void checkmainParent(Blobs.Blob x , Commit secordParent , Blobs point){
+        if (x == null) return;
+        checkmainParent(x.getLeft() , secordParent , point);
+        checkmainParent(x.getRight() , secordParent , point);
         Blobs.Blob secord = secordParent.file.search(x.getName());
+        Blobs.Blob pointt = point.search(x.getName());
+        /**仅在 当前存在的 不变 */
+        if(pointt == null && secord == null){
+
+        }
+        /** point没有 当前有 given也有 但相同 */
+        else if(pointt == null && secord != null && secord.getHashCode().equals(x.getHashCode())){
+
+        }
+        /** point没有 当前有 given也有 但不同 */
+        else if(pointt == null && secord != null){
+            mergeContent(x , x , secord , secordParent);
+        }
+    }
+
+    private void checksecordParent(Blobs.Blob x , Commit secordParent , Blobs point){
+        if (x == null) return;
+        checkmainParent(x.getLeft() , secordParent , point);
+        checkmainParent(x.getRight() , secordParent , point);
+
+        /**仅在 given存在的 checkout */
+        if(!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())){
+            Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
+            this.file.add(x.getHashCode() , x.getName() , Blobs.getContents(x));
+        }
+    }
+
+    private void checkMergeTime(Blobs.Blob x , Commit secordParent ){
+        if(x == null) return;
+        checkMergeTime(x.getLeft() , secordParent);
+        checkMergeTime(x.getRight() , secordParent);
+        /** 获取追踪文件 */
+        Blobs.Blob main = this.file.search(x.getName());
+        Blobs.Blob secord = secordParent.file.search(x.getName());
+        /**有可能 分支有 后面两个没有吗？*/
+        /** 任何存在于拆分点、当前分支中未修改且给定分支中不存在的文件都应被删除（并且未跟踪）。 */
+        if(main != null && secord == null && x.getHashCode().equals(main.getHashCode())){
+            Repository.addRemove(x.getName());
+            this.file.removeBlob(x.getName());
+        }
+        /** 任何存在于拆分点、在给定分支中未修改且在当前分支中不存在的文件都应保持不存在。 */
+        else if(main == null && secord != null && x.getHashCode().equals(secord.getHashCode())) {
+
+        }
+
+        else if (main == null && secord == null){
+
+        }
         /** 当前branch没变 given变了的Blob checkgiven */
-        if(x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())){
+        else if(x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())){
             Repository.checkoutCommit(secordParent.hashCode , x.getName());
-            x.change(secord.getHashCode());
+            this.file.removeBlob(main.getName());
+            this.file.add(secord.getHashCode(),secord.getName() , Blobs.getContents(secord));
         }
-        /** 当前branch变了 given没变 check 当前*/
+        /** 当前branch变了 given没变 check 不变 */
         else if(!x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())){
-            Repository.checkoutCommit(mainParent.hashCode , x.getName());
-            x.change(main.getHashCode());
+
         }
-        /** 两个文件现在具有相同的内容或都已被删除 */
+        /** 两个文件现在具有相同的内容或都已被删除  不变*/
         else if(secord.getHashCode().equals(main.getHashCode())){
-            Repository.checkoutCommit(mainParent.hashCode , x.getName());
-            x.change(main.getHashCode());
+            Repository.checkoutCommit(this.hashCode , x.getName());
         }
-        return x;
+        /** 两个文件不同内容 */
+        else{
+         mergeContent(x , main , secord , secordParent);
+        }
+    }
+
+    private void mergeContent(Blobs.Blob x , Blobs.Blob main , Blobs.Blob secord , Commit secordParent){
+        System.out.println("Encountered a merge conflict.");
+        if(main.getHashCode().equals(ZERO) || secord.getHashCode().equals(ZERO)){
+            this.file.removeBlob(x.getName());
+            this.file.add(ZERO , x.getName() , "");
+        }
+        else{
+            this.file.removeBlob(x.getName());
+            String contents = "<<<<<<< HEAD" + "\n" + Blobs.getContents(main) + "\n" +"=======" + "\n" + Blobs.getContents(secord) + "\n" + ">>>>>>>";
+            this.file.add(sha1(contents + x.getName()) , x.getName() , contents);
+            Repository.checkoutCommit(this.getHashCode() , x.getName());
+        }
     }
 
     /**把所有这个commit跟踪的有关文件导入进来*/
@@ -146,7 +201,7 @@ public class Commit implements Serializable {
         if(x == null) return;
         try {
             if (!join(CWD , x.getName()).exists()) {
-                if (x.getHashCode().equals(Main.ZERO)) {
+                if (x.getHashCode().equals(ZERO)) {
                     return;
                 }
                 join(CWD, x.getName()).createNewFile();

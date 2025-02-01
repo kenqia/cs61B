@@ -310,6 +310,11 @@ public class Main {
                 if(args.length != 2){
                     System.exit(0);
                 }
+                Stage nowStage3 = readObject(join(Repository.GITLET_DIR , STAGEFILE) , Stage.class );
+                if(nowStage3.getSize() != 0){
+                    System.out.println("You have uncommitted changes.");
+                    System.exit(0);
+                }
                 Branch nowBranch8 = readObject(join(Repository.GITLET_DIR , Main.HEADBRANCH) , Branch.class);
                 Branch theGivenBranch = Repository.searchBranch(args[1]);
                 /** 不能merge自己 */
@@ -332,6 +337,7 @@ public class Main {
                 if(nowBranch8.HEAD.getHashCode().equals(point.getCommitCode())) {
                     /** java gitlet.Main checkout [branch name] */
                                Repository.checkoutBranch(theGivenBranch);
+                               System.out.println("Current branch fast-forwarded.");
                 }
                 /** 获取 时间数据 */
                 Date dateNow = new Date();
@@ -341,6 +347,8 @@ public class Main {
                 Blobs h = new Blobs(nowBranch8.HEAD.getBlob().getRoot());
                 Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), "1111"), nowBranch8.HEAD, theGivenBranch.HEAD, h);
                 mergeCommit.checkMerge(point);
+                System.out.println("Merged " + theGivenBranch.name + " into " + nowBranch8.name  + ".");
+                mergeCommit.loadingCommit();
 
                 break;
             default:

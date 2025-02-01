@@ -99,7 +99,7 @@ public class Blobs implements Serializable {
     private Blob addidk(Blob node, String code , String name , String contents) {
         if (node == null) {
             Blob sister = new Blob(code, null, null, "RED" , name);
-             savingBlob(root , contents);
+             savingBlob(sister , contents);
             return sister;
         }
         int cmp = name.compareTo(node.name);
@@ -147,7 +147,7 @@ public class Blobs implements Serializable {
         return node != null && node.color.equals("RED");
     }
 
-    private void removeBlob(String name){
+    public void removeBlob(String name){
         if(name == null) return;
         this.root = removeBlobTime(root , name);
     }
