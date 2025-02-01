@@ -86,7 +86,8 @@ public class Commit implements Serializable {
     private void checkTraceTime(Blobs.Blob x, Branch e) {
         if (x == null) return;
         /** checkout过来的Blobs的内容包含 now Blobs的内容 */
-        if (!e.HEAD.getBlob().searchExist(x.getName())) {
+        File path = join(CWD , x.getName());
+        if ( path.exists() && !e.HEAD.getBlob().searchExist(x.getName())) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
         }

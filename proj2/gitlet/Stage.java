@@ -5,7 +5,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static gitlet.Main.ZERO;
 import static gitlet.Repository.GITLET_DIR;
+import static gitlet.Repository.removeRemove;
 import static gitlet.Utils.*;
 import static java.util.Collections.sort;
 
@@ -28,7 +30,7 @@ public class Stage implements Serializable {
     public static String getContents(node x) {
         String code = x.code;
         /** 存储 */
-        if (code.equals(Main.ZERO)) return null;
+        if (code.equals(ZERO)) return null;
         String index = code.substring(0, 2);
         File whereAdding = join(GITLET_DIR, "stagingArea");
         return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
@@ -146,8 +148,13 @@ public class Stage implements Serializable {
                     ptr.next = x.next;
                     String index = x.code.substring(0, 2);
                     File find = join(GITLET_DIR, "stagingArea");
-                    join(join(find, index), x.code.substring(2)).delete();
-                    join(find, index).delete();
+                    if(x.code.equals(ZERO)){
+                        removeRemove(name);
+                    }
+                    else {
+                        join(join(find, index), x.code.substring(2)).delete();
+                        join(find, index).delete();
+                    }
                     this.head[i].size--;
                     if (this.head[i].size == 0) this.size--;
                     return x;
@@ -173,7 +180,7 @@ public class Stage implements Serializable {
             node x = head[i].next;
             while (x != null) {
                 /** 拒绝add remove的stage信息*/
-                if (!x.code.equals(Main.ZERO)) {
+                if (!x.code.equals(ZERO)) {
                     order.add(x.name);
                 } else {
                     removeOrder.add(x.name);

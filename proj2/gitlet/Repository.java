@@ -52,8 +52,7 @@ public class Repository {
         if (!theFile.exists()) {
             Stage.node x = nowStage.search(name);
             if (x != null && x.getCode().equals(ZERO)) {
-                nowStage.remove(name);
-                removeRemove(name);
+                nowStage.removeStage(name);
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), nowStage);
                 System.exit(0);
             }
