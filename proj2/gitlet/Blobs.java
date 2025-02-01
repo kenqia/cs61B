@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+import static gitlet.Main.ZERO;
 import static gitlet.Utils.*;
 
 /**
@@ -26,7 +27,7 @@ public class Blobs implements Serializable {
 
     public static String getContents(Blob x) {
         String code = x.hashCode;
-        if (code.equals(Main.ZERO)) return null;
+        if (code.equals(ZERO)) return null;
         /** 存储 */
         String index = code.substring(0, 2);
         File whereSaving = join(Repository.GITLET_DIR, "objects");
@@ -42,7 +43,7 @@ public class Blobs implements Serializable {
      */
     public void savingBlob(Blob bro, String contents) {
         /** 判断是否为移除操作 */
-        if (bro.hashCode.equals(Main.ZERO)) return;
+        if (bro.hashCode.equals(ZERO)) return;
         String code = bro.hashCode;
         /** 存储 */
         String index = code.substring(0, 2);
@@ -64,6 +65,10 @@ public class Blobs implements Serializable {
     public void checkBlobs(String code, String name, String contents) {
         /** 若有相同名字 ， 则覆盖 */
         if (searchExist(name)) {
+            if(code.equals(ZERO)){
+                removeBlob(name);
+                return;
+            }
             removeBlob(name);
             add(code, name, contents);
             Blob bro = search(name);

@@ -14,20 +14,11 @@ import static gitlet.Utils.*;
 
 /**
  * Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  * <p>
  * kenqia
  */
 public class Commit implements Serializable {
-    /**
-     * TODO: add instance variables here.
-     * <p>
-     * <p>
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
     public Metadata metadata;
     private final Commit parent;
@@ -97,6 +88,7 @@ public class Commit implements Serializable {
         checkTraceTime(this.getBlob().getRoot(), nowBranch);
     }
 
+    /** checkout过来的Blobs的内容包含 now Blobs的内容 */
     private void checkTraceTime(Blobs.Blob x, Branch e) {
         if (x == null) return;
         if (!e.HEAD.getBlob().searchExist(x.getName())) {
