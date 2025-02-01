@@ -9,7 +9,9 @@ import static gitlet.Repository.GITLET_DIR;
 import static gitlet.Utils.*;
 import static java.util.Collections.sort;
 
-/** 存储存储区的数据 使用hash table */
+/**
+ * 存储存储区的数据 使用hash table
+ */
 public class Stage implements Serializable {
     private node[] head;
     private int size;
@@ -18,17 +20,26 @@ public class Stage implements Serializable {
         head = new node[sizee];
         size = 0;
         for (int i = 0; i < head.length; i++) {
-            head[i] = new node(null, "0" , "0");
+            head[i] = new node(null, "0", "0");
             head[i].size = 0;
         }
     }
 
-    public void add(String code , String name) {
+    public static String getContents(node x) {
+        String code = x.code;
+        /** 存储 */
+        if (code.equals(Main.ZERO)) return null;
+        String index = code.substring(0, 2);
+        File whereAdding = join(GITLET_DIR, "stagingArea");
+        return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
+    }
+
+    public void add(String code, String name) {
         int index = Math.abs(code.hashCode()) % head.length;
-        node adding = new node(null, code , name);
+        node adding = new node(null, code, name);
         head[index] = addlast(head[index], adding);
         head[index].size++;
-        if(this.head[index].size == 1) this.size++;
+        if (this.head[index].size == 1) this.size++;
         check(this.size, head[index].size);
     }
 
@@ -41,7 +52,9 @@ public class Stage implements Serializable {
         return head;
     }
 
-    /** 检查 比例 调整大小 */
+    /**
+     * 检查 比例 调整大小
+     */
     private void check(int stageSize, int dequeSize) {
         if ((double) dequeSize / (double) stageSize >= 1.5) {
             resize();
@@ -53,26 +66,29 @@ public class Stage implements Serializable {
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
-                one.add(x.code , x.name);
+                one.add(x.code, x.name);
                 x = x.next;
             }
         }
         this.head = one.head;
         this.size = one.size;
     }
-    public node[] getHead(){
+
+    public node[] getHead() {
         return this.head;
     }
 
-    /** commit操作中 遍历存储区 执行操作 */
-    public Blobs check(Blobs Trees){
+    /**
+     * commit操作中 遍历存储区 执行操作
+     */
+    public Blobs check(Blobs Trees) {
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
-                String index = x.code.substring(0 , 2);
-                File find = join(GITLET_DIR , "stagingArea");
+                String index = x.code.substring(0, 2);
+                File find = join(GITLET_DIR, "stagingArea");
                 String contents = getContents(x);
-                Trees.checkBlobs(x.code , x.name , contents);
+                Trees.checkBlobs(x.code, x.name, contents);
                 join(join(find, index), x.code.substring(2)).delete();
                 join(find, index).delete();
                 x = x.next;
@@ -81,48 +97,37 @@ public class Stage implements Serializable {
         return Trees;
     }
 
-    public boolean isExist(String name){
+    public boolean isExist(String name) {
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
-                if(x.name.equals(name)) return true;
+                if (x.name.equals(name)) return true;
                 x = x.next;
             }
         }
         return false;
     }
 
-    public node remove(String name){
+    public node search(String name) {
         for (int i = 0; i < this.head.length; i++) {
-            node ptr = head[i];
             node x = head[i].next;
             while (x != null) {
-                if(x.name.equals(name)){
-                    ptr.next = x.next;
-                    this.head[i].size--;
-                    if(this.head[i].size == 0) this.size--;
-                    return x;
-                };
+                if (x.name.equals(name)) return x;
                 x = x.next;
-                ptr = ptr.next;
             }
         }
         return null;
     }
 
-    public node removeStage(String name){
+    public node remove(String name) {
         for (int i = 0; i < this.head.length; i++) {
             node ptr = head[i];
             node x = head[i].next;
             while (x != null) {
-                if(x.name.equals(name)){
+                if (x.name.equals(name)) {
                     ptr.next = x.next;
-                    String index = x.code.substring(0 , 2);
-                    File find = join(GITLET_DIR , "stagingArea");
-                    join(join(find, index), x.code.substring(2)).delete();
-                    join(find, index).delete();
                     this.head[i].size--;
-                    if(this.head[i].size == 0) this.size--;
+                    if (this.head[i].size == 0) this.size--;
                     return x;
                 }
                 x = x.next;
@@ -132,20 +137,33 @@ public class Stage implements Serializable {
         return null;
     }
 
-    public int getSize(){
+    public node removeStage(String name) {
+        for (int i = 0; i < this.head.length; i++) {
+            node ptr = head[i];
+            node x = head[i].next;
+            while (x != null) {
+                if (x.name.equals(name)) {
+                    ptr.next = x.next;
+                    String index = x.code.substring(0, 2);
+                    File find = join(GITLET_DIR, "stagingArea");
+                    join(join(find, index), x.code.substring(2)).delete();
+                    join(find, index).delete();
+                    this.head[i].size--;
+                    if (this.head[i].size == 0) this.size--;
+                    return x;
+                }
+                x = x.next;
+                ptr = ptr.next;
+            }
+        }
+        return null;
+    }
+
+    public int getSize() {
         return this.size;
     }
 
-    public static String getContents(node x){
-        String code = x.code;
-        /** 存储 */
-        if(code.equals(Main.ZERO)) return null;
-        String index = code.substring(0 , 2);
-        File whereAdding = join(GITLET_DIR , "stagingArea");
-        return readContentsAsString(join(join(whereAdding, index), code.substring(2)));
-    }
-
-    public void printInfo(){
+    public void printInfo() {
         /**遍历添加到order列表里 最后排序输出 , */
         System.out.println("=== Staged Files ===");
         List<String> removeOrder = new ArrayList<>();
@@ -155,10 +173,9 @@ public class Stage implements Serializable {
             node x = head[i].next;
             while (x != null) {
                 /** 拒绝add remove的stage信息*/
-                if(!x.code.equals(Main.ZERO)) {
+                if (!x.code.equals(Main.ZERO)) {
                     order.add(x.name);
-                }
-                else{
+                } else {
                     removeOrder.add(x.name);
                 }
                 x = x.next;
@@ -166,12 +183,12 @@ public class Stage implements Serializable {
         }
         sort(order);
         sort(removeOrder);
-        for(String item : order){
+        for (String item : order) {
             System.out.println(item);
         }
         System.out.println();
         System.out.println("=== Removed Files ===");
-        for(String item : removeOrder){
+        for (String item : removeOrder) {
             System.out.println(item);
         }
         System.out.println();
@@ -179,23 +196,23 @@ public class Stage implements Serializable {
 
     }
 
-    private class node implements Serializable {
+    public class node implements Serializable {
         private node next;
-        private String code;
-        private String name;
+        private final String code;
+        private final String name;
         private int size;
 
-        private node(node next, String code , String name) {
+        private node(node next, String code, String name) {
             this.code = code;
             this.name = name;
             this.next = next;
         }
 
-        public int getSize(){
-            return this.size;
+        public int getSize() {return this.size;}
+
+        public String getCode(){
+            return this.code;
         }
-
-
     }
 
 

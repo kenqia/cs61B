@@ -6,31 +6,48 @@ import java.io.Serializable;
 
 import static gitlet.Utils.*;
 
-/** Blobs 是存储Blob的LLRB树 , Blob 是存储文件信息的类 */
+/**
+ * Blobs 是存储Blob的LLRB树 , Blob 是存储文件信息的类
+ */
 public class Blobs implements Serializable {
-    public Blob root; /** Top Blob */
+    public Blob root;
 
-    public Blobs(Blob root){
+    /**
+     * Top Blob
+     */
+
+    public Blobs(Blob root) {
         this.root = root;
+    }
+
+    public static Blob clone(Blob x) {
+        return x;
+    }
+
+    public static String getContents(Blob x) {
+        String code = x.hashCode;
+        if (code.equals(Main.ZERO)) return null;
+        /** 存储 */
+        String index = code.substring(0, 2);
+        File whereSaving = join(Repository.GITLET_DIR, "objects");
+        return readContentsAsString(join(join(whereSaving, index), code.substring(2)));
     }
 
     public Blob getRoot() {
         return root;
     }
 
-    public static Blob clone(Blob x){
-        return x;
-    }
-
-    /** 把指定Blob的contents(由hash code搜索 存储contents)存储起来 , 放到objects 区 */
-    public void savingBlob(Blob bro , String contents){
+    /**
+     * 把指定Blob的contents(由hash code搜索 存储contents)存储起来 , 放到objects 区
+     */
+    public void savingBlob(Blob bro, String contents) {
         /** 判断是否为移除操作 */
-        if(bro.hashCode.equals(Main.ZERO)) return;
+        if (bro.hashCode.equals(Main.ZERO)) return;
         String code = bro.hashCode;
         /** 存储 */
-        String index = code.substring(0 , 2);
-        File whereSaving = join(Repository.GITLET_DIR , "objects");
-        join(whereSaving , index).mkdirs();
+        String index = code.substring(0, 2);
+        File whereSaving = join(Repository.GITLET_DIR, "objects");
+        join(whereSaving, index).mkdirs();
         try {
             if (!join(join(whereSaving, index), code.substring(2)).exists())
                 join(join(whereSaving, index), code.substring(2)).createNewFile();
@@ -38,27 +55,38 @@ public class Blobs implements Serializable {
             throw new RuntimeException(e);
         }
         /** 写入 */
-        writeContents(join(join(whereSaving, index), code.substring(2)) , contents);
+        writeContents(join(join(whereSaving, index), code.substring(2)), contents);
     }
 
-    /** commit时 检查stage区与上一个commit的关系 */
-    public void checkBlobs(String code , String name , String contents){
+    /**
+     * commit时 检查stage区与上一个commit的关系
+     */
+    public void checkBlobs(String code, String name, String contents) {
         /** 若有相同名字 ， 则覆盖 */
-        if(searchExist(name)){
+        if (searchExist(name)) {
             removeBlob(name);
-            add(code , name , contents);
+            add(code, name, contents);
             Blob bro = search(name);
-                savingBlob(bro , contents);
-        }else{
+            savingBlob(bro, contents);
+        } else {
             /** 没有 则添加 */
-            add(code , name , contents);
+            add(code, name, contents);
         }
     }
+
     public Blob search(String name) {
         if (name == null) return null;
         else {
             return searchTime(root, name);
         }
+    }
+
+    private Blob searchTime(Blob root, String name) {
+        if (root == null) return null;
+        int cmp = name.compareTo(root.name);
+        if (cmp > 0) return searchTime(root.right, name);
+        else if (cmp < 0) return searchTime(root.left, name);
+        else return root;
     }
 
     public boolean searchExist(String name) {
@@ -76,35 +104,25 @@ public class Blobs implements Serializable {
         else return true;
     }
 
-
-    private Blob searchTime(Blob root, String name) {
-        if (root == null) return null;
-        int cmp = name.compareTo(root.name);
-        if (cmp > 0) return searchTime(root.right, name);
-        else if (cmp < 0) return searchTime(root.left, name);
-        else return root;
-    }
-
-    public void add(String code , String name , String contents) {
-        if (this.root == null){
-            this.root = new Blob(code, null, null, "BLACK" , name);
-            savingBlob(root , contents);
-        }
-        else this.root = addidk(this.root, code , name , contents);
+    public void add(String code, String name, String contents) {
+        if (this.root == null) {
+            this.root = new Blob(code, null, null, "BLACK", name);
+            savingBlob(root, contents);
+        } else this.root = addidk(this.root, code, name, contents);
         if (root != null) {
             root.color = "BLACK";
         }
     }
 
-    private Blob addidk(Blob node, String code , String name , String contents) {
+    private Blob addidk(Blob node, String code, String name, String contents) {
         if (node == null) {
-            Blob sister = new Blob(code, null, null, "RED" , name);
-             savingBlob(sister , contents);
+            Blob sister = new Blob(code, null, null, "RED", name);
+            savingBlob(sister, contents);
             return sister;
         }
         int cmp = name.compareTo(node.name);
-        if (cmp > 0) node.right = addidk(node.right, code , name , contents);
-        else if (cmp < 0) node.left = addidk(node.left, code , name , contents);
+        if (cmp > 0) node.right = addidk(node.right, code, name, contents);
+        else if (cmp < 0) node.left = addidk(node.left, code, name, contents);
         else return node;
 
         if (isRed(node.right) && !isRed(node.left)) {
@@ -140,35 +158,32 @@ public class Blobs implements Serializable {
         else node.color = "RED";
         if (node.left != null) node.left.color = "BLACK";
         if (node.right != null) node.right.color = "BLACK";
-        return  node;
+        return node;
     }
 
-    private boolean isRed(Blob node){
+    private boolean isRed(Blob node) {
         return node != null && node.color.equals("RED");
     }
 
-    public void removeBlob(String name){
-        if(name == null) return;
-        this.root = removeBlobTime(root , name);
+    public void removeBlob(String name) {
+        if (name == null) return;
+        this.root = removeBlobTime(root, name);
     }
 
-    private Blob removeBlobTime(Blob root , String name){
-        if(root == null ) return null;
+    private Blob removeBlobTime(Blob root, String name) {
+        if (root == null) return null;
 
         int cmp = name.compareTo(root.name);
-        if(cmp > 0){
-            root.right = removeBlobTime(root.right , name);
-        }
-        else if(cmp < 0){
-            root.left = removeBlobTime(root.left , name);
-        }
-        else{
-            if(root.left == null && root.right == null) return null;
-            else if(root.left != null && root.right != null){
+        if (cmp > 0) {
+            root.right = removeBlobTime(root.right, name);
+        } else if (cmp < 0) {
+            root.left = removeBlobTime(root.left, name);
+        } else {
+            if (root.left == null && root.right == null) return null;
+            else if (root.left != null && root.right != null) {
                 root = swapAfter(root);
-            }
-            else{
-                if(root.left != null) return root.left;
+            } else {
+                if (root.left != null) return root.left;
                 return root.right;
             }
         }
@@ -180,53 +195,43 @@ public class Blobs implements Serializable {
             root = filpColor(root);
         }
         return root;
-        
+
     }
-        /** 交换前驱节点并删除 */
-    private Blob swapAfter(Blob root){
-        if(root.left.right != null){
+
+    /**
+     * 交换前驱节点并删除
+     */
+    private Blob swapAfter(Blob root) {
+        if (root.left.right != null) {
             root.hashCode = root.left.right.hashCode;
             root.name = root.left.right.name;
-            if(root.left.right.left == null && root.left.right.right == null){
+            if (root.left.right.left == null && root.left.right.right == null) {
                 root.left.right = null;
-            }
-            else{
-                if(root.left.right.left != null) root.left.right = root.left.right.left;
+            } else {
+                if (root.left.right.left != null) root.left.right = root.left.right.left;
                 else root.left.right = root.left.right.right;
             }
             return root;
-        }
-        else{
+        } else {
             root.hashCode = root.left.hashCode;
             root.name = root.left.name;
-            if(root.left.left == null){
+            if (root.left.left == null) {
                 root.left = null;
-            }
-            else{
+            } else {
                 root.left = root.left.left;
             }
             return root;
         }
     }
 
-    public static String getContents(Blob x){
-        String code = x.hashCode;
-        if (code.equals(Main.ZERO)) return null;
-        /** 存储 */
-        String index = code.substring(0 , 2);
-        File whereSaving = join(Repository.GITLET_DIR , "objects");
-        return readContentsAsString(join(join(whereSaving, index), code.substring(2)));
-    }
-
-
     public class Blob implements Serializable {
-        private String hashCode;
-        private String name;
         public Blob left;
         public Blob right;
+        private String hashCode;
+        private String name;
         private String color;
 
-        public Blob(String code, Blob left, Blob right, String color , String name) {
+        public Blob(String code, Blob left, Blob right, String color, String name) {
             this.hashCode = code;
             this.left = left;
             this.right = right;
@@ -234,30 +239,29 @@ public class Blobs implements Serializable {
             this.name = name;
         }
 
-        public String getName(){
+        public String getName() {
             return this.name;
         }
-        public Blob getLeft(){
+
+        public Blob getLeft() {
             return this.left;
         }
-        public Blob getRight(){
+
+        public Blob getRight() {
             return this.right;
         }
 
-        public String getHashCode(){
+        public String getHashCode() {
             return this.hashCode;
         }
 
-        /** 不包含路径的名字 */
-        public String getTruename(){
-            return this.name.substring(this.name.lastIndexOf("/")+1);
-        }
-
-        public void change(String code){
-            this.hashCode = code;
+        /**
+         * 不包含路径的名字
+         */
+        public String getTruename() {
+            return this.name.substring(this.name.lastIndexOf("/") + 1);
         }
 
     }
-
 
 }
