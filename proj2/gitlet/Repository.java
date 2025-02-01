@@ -8,23 +8,10 @@ import java.util.List;
 import static gitlet.Main.*;
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
-/**
- * Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- * <p>
+/**\
  * kenqia
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
     /**
      * The current working directory.
@@ -35,7 +22,6 @@ public class Repository {
      */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    /* TODO: fill in the rest of this class. */
 
     public static void init() {
         /**创建各种文件夹*/
@@ -68,6 +54,7 @@ public class Repository {
             if (x != null && x.getCode().equals(ZERO)) {
                 nowStage.remove(name);
                 removeRemove(name);
+                writeObject(join(Repository.GITLET_DIR, STAGEFILE), nowStage);
                 System.exit(0);
             }
             else {
@@ -85,13 +72,16 @@ public class Repository {
         String index = hashCode.substring(0, 2);
         File whereAdding = join(GITLET_DIR, "stagingArea");
         /** 检查当前commit的文件 所add文件是否已存在当前commit*/
-        if (find != null && find.searchExist(name) && (Blobs.getContents(find.search(name)).equals(contents))) {
-            if (join(join(whereAdding, index), hashCode.substring(2)).exists()) {
-                /** 存在就删掉 */
-                join(join(whereAdding, index), hashCode.substring(2)).delete();
-                join(whereAdding, index).delete();
+        if(find != null) {
+            Blobs.Blob item = find.search(name);
+            if (item != null && item.getHashCode().equals(hashCode)) {
+                if (join(join(whereAdding, index), hashCode.substring(2)).exists()) {
+                    /** 存在就删掉 */
+                    join(join(whereAdding, index), hashCode.substring(2)).delete();
+                    join(whereAdding, index).delete();
+                }
+                System.exit(0);
             }
-            System.exit(0);
         }
         /** 更新存储区文件内容 */
         if (nowStage.isExist(name)) {
@@ -271,12 +261,11 @@ public class Repository {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
-        File whereBranch1 = join(Repository.GITLET_DIR, "branch");
-        String[] branchHere1 = whereBranch1.list();
-        List<String> Branches1 = new ArrayList<>();
-        for (String item : branchHere1) {
-            int flag1 = 0;
-            File branchNow = join(whereBranch1, item);
+        File whereBranch = join(Repository.GITLET_DIR, "branch");
+        String[] branchHere = whereBranch.list();
+        for (String item : branchHere) {
+            int flag = 0;
+            File branchNow = join(whereBranch, item);
             List<String> branch = plainFilenamesIn(branchNow);
             for (String one : branch) {
                 Branch branchItem = readObject(join(branchNow, one), Branch.class);
@@ -285,11 +274,11 @@ public class Repository {
                     nowBranch.HEAD.delete();
                     branchItem.HEAD.get();
                     writeObject(join(Repository.GITLET_DIR, HEADBRANCH), branchItem);
-                    flag1 = 1;
+                    flag = 1;
                     break;
                 }
             }
-            if (flag1 == 1) {
+            if (flag == 1) {
                 /**  重置 stage */
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), new Stage(10));
                 System.exit(0);

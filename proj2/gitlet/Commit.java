@@ -1,6 +1,5 @@
 package gitlet;
 
-// TODO: any imports you need here
 
 import java.io.File;
 import java.io.IOException;
@@ -12,22 +11,8 @@ import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
 
-/**
- * Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- * <p>
- * kenqia
- */
+
 public class Commit implements Serializable {
-    /**
-     * TODO: add instance variables here.
-     * <p>
-     * <p>
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
     public Metadata metadata;
     private final Commit parent;
@@ -92,6 +77,7 @@ public class Commit implements Serializable {
     /**
      * 检查一下这个commit要checkout过来的文件有没有被全部追踪
      */
+
     public void checkTrace() {
         Branch nowBranch = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
         checkTraceTime(this.getBlob().getRoot(), nowBranch);
@@ -99,6 +85,7 @@ public class Commit implements Serializable {
 
     private void checkTraceTime(Blobs.Blob x, Branch e) {
         if (x == null) return;
+        /** checkout过来的Blobs的内容包含 now Blobs的内容 */
         if (!e.HEAD.getBlob().searchExist(x.getName())) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
