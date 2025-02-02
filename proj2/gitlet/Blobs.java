@@ -63,11 +63,15 @@ public class Blobs implements Serializable {
      * commit时 检查stage区与上一个commit的关系
      */
     public void checkBlobs(String code, String name, String contents) {
+        Blob bro = search(name);
         /** 若有相同名字 ， 则覆盖 */
-        if (searchExist(name)) {
+        if (bro != null) {
+            if(bro.getHashCode().equals(ZERO)){
+                removeBlob(bro.getName());
+                return;
+            }
             removeBlob(name);
             add(code, name, contents);
-            Blob bro = search(name);
             savingBlob(bro, contents);
         } else {
             /** 没有 则添加 */

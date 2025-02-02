@@ -349,12 +349,11 @@ public class Main {
 
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Blobs h = new Blobs(nowBranch8.HEAD.getBlob().getRoot());
-                Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), "1111"), nowBranch8.HEAD, theGivenBranch.HEAD, h);
+                Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), ""), nowBranch8.HEAD, theGivenBranch.HEAD, h);
                 mergeCommit.checkMerge(point);
                 System.out.println("Merged " + theGivenBranch.name + " into " + nowBranch8.name + ".");
                 mergeCommit.loadingCommit();
-                Branch nowBranch9 = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
-                Repository.checkoutBranch(nowBranch9);
+                writeObject(join(Repository.GITLET_DIR, STAGEFILE), new Stage(10));
                 break;
             default:
                 System.out.println("No command with that name exists.");

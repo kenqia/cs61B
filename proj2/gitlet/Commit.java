@@ -149,9 +149,7 @@ public class Commit implements Serializable {
         }
         /** 任何存在于拆分点、在给定分支中未修改且在当前分支中不存在的文件都应保持不存在。 */
         else if (main == null && secord != null && x.getHashCode().equals(secord.getHashCode())) {
-
         } else if (main == null && secord == null) {
-
         }
         /** 当前branch没变 given变了的Blob checkgiven */
         else if (x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())) {
@@ -161,14 +159,15 @@ public class Commit implements Serializable {
         }
         /** 当前branch变了 given没变 check 不变 */
         else if (!x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())) {
-
         }
         /** 两个文件现在具有相同的内容或都已被删除  不变*/
         else if (secord.getHashCode().equals(main.getHashCode())) {
+            System.out.println("6");
             Repository.checkoutCommit(this.hashCode, x.getName());
         }
         /** 两个文件不同内容 */
         else {
+            System.out.println("7");
             mergeContent(x, main, secord, secordParent);
         }
     }
