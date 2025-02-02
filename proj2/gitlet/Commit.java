@@ -162,12 +162,10 @@ public class Commit implements Serializable {
         }
         /** 两个文件现在具有相同的内容或都已被删除  不变*/
         else if (secord.getHashCode().equals(main.getHashCode())) {
-            System.out.println("6");
             Repository.checkoutCommit(this.hashCode, x.getName());
         }
         /** 两个文件不同内容 */
         else {
-            System.out.println("7");
             mergeContent(x, main, secord, secordParent);
         }
     }

@@ -72,7 +72,6 @@ public class Blobs implements Serializable {
             }
             removeBlob(name);
             add(code, name, contents);
-            savingBlob(bro, contents);
         } else {
             /** 没有 则添加 */
             add(code, name, contents);
