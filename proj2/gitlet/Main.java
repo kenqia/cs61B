@@ -346,7 +346,6 @@ public class Main {
                 /** 获取 时间数据 */
                 Date dateNow = new Date();
                 SimpleDateFormat formatterNow = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z", Locale.ENGLISH);
-
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Blobs h = new Blobs(nowBranch8.HEAD.getBlob().getRoot());
                 Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), ""), nowBranch8.HEAD, theGivenBranch.HEAD, h);

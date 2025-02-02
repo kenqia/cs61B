@@ -21,9 +21,6 @@ public class Blobs implements Serializable {
         this.root = root;
     }
 
-    public static Blob clone(Blob x) {
-        return x;
-    }
 
     public static String getContents(Blob x) {
         String code = x.hashCode;
@@ -74,6 +71,9 @@ public class Blobs implements Serializable {
             add(code, name, contents);
         } else {
             /** 没有 则添加 */
+            if(bro.getHashCode().equals(ZERO)){
+                return;
+            }
             add(code, name, contents);
         }
     }
