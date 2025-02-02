@@ -71,7 +71,7 @@ public class Blobs implements Serializable {
             add(code, name, contents);
         } else {
             /** 没有 则添加 */
-            if(bro.getHashCode().equals(ZERO)){
+            if(code.equals(ZERO)){
                 return;
             }
             add(code, name, contents);
