@@ -253,7 +253,7 @@ public class Main {
                 }
 
                 /** java gitlet.Main checkout [commit id] -- [file name] */
-                else if (args.length == 4 && args[2].equals("--")) {
+                else if (args.length == 4 && ( args[2].equals("--") || args[2].equals("++"))) {
                     Repository.checkoutCommit(args[1], args[3]);
                 }
                 break;
