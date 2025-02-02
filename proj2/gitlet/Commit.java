@@ -108,6 +108,7 @@ public class Commit implements Serializable {
         checkmainParent(x.getRight(), secordParent, point);
         Blobs.Blob secord = secordParent.file.search(x.getName());
         Blobs.Blob pointt = point.search(x.getName());
+        System.out.println(x.getHashCode());
         /**仅在 当前存在的 不变 */
         if (pointt == null && secord == null) {
 
@@ -126,7 +127,7 @@ public class Commit implements Serializable {
         if (x == null) return;
         checkmainParent(x.getLeft(), secordParent, point);
         checkmainParent(x.getRight(), secordParent, point);
-
+        System.out.println(x.getHashCode());
         /**仅在 given存在的 checkout */
         if (!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())) {
             Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
@@ -143,29 +144,38 @@ public class Commit implements Serializable {
         Blobs.Blob secord = secordParent.file.search(x.getName());
         /**有可能 分支有 后面两个没有吗？*/
         /** 任何存在于拆分点、当前分支中未修改且给定分支中不存在的文件都应被删除（并且未跟踪）。 */
+        System.out.println(x.getHashCode());
+        if(x.getHashCode().equals(ZERO)) return;
         if (main != null && secord == null && x.getHashCode().equals(main.getHashCode())) {
             Repository.addRemove(x.getName());
             this.file.removeBlob(x.getName());
+            System.out.println("1");
         }
         /** 任何存在于拆分点、在给定分支中未修改且在当前分支中不存在的文件都应保持不存在。 */
         else if (main == null && secord != null && x.getHashCode().equals(secord.getHashCode())) {
+            System.out.println("2");
         } else if (main == null && secord == null) {
+            System.out.println("3");
         }
         /** 当前branch没变 given变了的Blob checkgiven */
         else if (x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())) {
+            System.out.println("4");
             Repository.checkoutCommit(secordParent.hashCode, x.getName());
             this.file.removeBlob(main.getName());
             this.file.add(secord.getHashCode(), secord.getName(), Blobs.getContents(secord));
         }
         /** 当前branch变了 given没变 check 不变 */
         else if (!x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())) {
+            System.out.println("5");
         }
         /** 两个文件现在具有相同的内容或都已被删除  不变*/
         else if (secord.getHashCode().equals(main.getHashCode())) {
+            System.out.println("6");
             Repository.checkoutCommit(this.hashCode, x.getName());
         }
         /** 两个文件不同内容 */
         else {
+            System.out.println("7");
             mergeContent(x, main, secord, secordParent);
         }
     }
