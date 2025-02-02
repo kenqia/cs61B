@@ -127,7 +127,6 @@ public class Commit implements Serializable {
         if (x == null) return;
         checkmainParent(x.getLeft(), secordParent, point);
         checkmainParent(x.getRight(), secordParent, point);
-
         /**仅在 given存在的 checkout */
         if (!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())) {
             Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
