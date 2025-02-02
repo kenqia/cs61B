@@ -165,67 +165,96 @@ public class Blobs implements Serializable {
         return node;
     }
 
+    private void flipColor(Blob node) {
+        if (node.color.equals("RED")) node.color = "BLACK";
+        else node.color = "RED";
+        if (node.left != null) node.left.color = "BLACK";
+        if (node.right != null) node.right.color = "BLACK";
+    }
+
     private boolean isRed(Blob node) {
         return node != null && node.color.equals("RED");
     }
 
+    // Remove a Blob (maintaining LLRB property)
     public void removeBlob(String name) {
         if (name == null) return;
-        this.root = removeBlobTime(root, name);
+        root = removeBlobTime(root, name);
+        if (root != null) root.color = "BLACK";
     }
 
-    private Blob removeBlobTime(Blob root, String name) {
-        if (root == null) return null;
+    private Blob removeBlobTime(Blob node, String name) {
+        if (node == null) return null;
 
-        int cmp = name.compareTo(root.name);
-        if (cmp > 0) {
-            root.right = removeBlobTime(root.right, name);
-        } else if (cmp < 0) {
-            root.left = removeBlobTime(root.left, name);
+        int cmp = name.compareTo(node.name);
+        if (cmp < 0) {
+            if (!isRed(node.left) && !isRed(node.left.left)) {
+                node = moveRedLeft(node);
+            }
+            node.left = removeBlobTime(node.left, name);
         } else {
-            if (root.left == null && root.right == null) return null;
-            else if (root.left != null && root.right != null) {
-                root = swapAfter(root);
+            if (isRed(node.left)) {
+                node = rotateRight(node);
+            }
+            if (cmp == 0 && node.right == null) {
+                return null;
+            }
+            if (!isRed(node.right) && !isRed(node.right.left)) {
+                node = moveRedRight(node);
+            }
+            if (cmp == 0) {
+                Blob min = getMin(node.right);
+                node.name = min.name;
+                node.hashCode = min.hashCode;
+                node.right = removeMin(node.right);
             } else {
-                if (root.left != null) return root.left;
-                return root.right;
+                node.right = removeBlobTime(node.right, name);
             }
         }
-        if (isRed(root.right) && !isRed(root.left)) {
-            root = rotateLeft(root);
-        } else if (isRed(root.left) && isRed(root.left.left)) {
-            root = rotateRight(root);
-        } else if (isRed(root.right) && isRed(root.left)) {
-            root = filpColor(root);
-        }
-        return root;
 
+        return balance(node);
     }
 
-    /**
-     * 交换前驱节点并删除
-     */
-    private Blob swapAfter(Blob root) {
-        if (root.left.right != null) {
-            root.hashCode = root.left.right.hashCode;
-            root.name = root.left.right.name;
-            if (root.left.right.left == null && root.left.right.right == null) {
-                root.left.right = null;
-            } else {
-                if (root.left.right.left != null) root.left.right = root.left.right.left;
-                else root.left.right = root.left.right.right;
-            }
-            return root;
-        } else {
-            root.hashCode = root.left.hashCode;
-            root.name = root.left.name;
-            if (root.left.left == null) {
-                root.left = null;
-            } else {
-                root.left = root.left.left;
-            }
-            return root;
+    private Blob moveRedLeft(Blob node) {
+        flipColor(node);
+        if (isRed(node.right.left)) {
+            node.right = rotateRight(node.right);
+            node = rotateLeft(node);
+            flipColor(node);
         }
+        return node;
+    }
+
+    private Blob moveRedRight(Blob node) {
+        flipColor(node);
+        if (isRed(node.left.left)) {
+            node = rotateRight(node);
+            flipColor(node);
+        }
+        return node;
+    }
+
+    private Blob getMin(Blob node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    private Blob removeMin(Blob node) {
+        if (node.left == null) return null;
+        if (!isRed(node.left) && !isRed(node.left.left)) {
+            node = moveRedLeft(node);
+        }
+        node.left = removeMin(node.left);
+        return balance(node);
+    }
+
+    private Blob balance(Blob node) {
+        if (isRed(node.right)) node = rotateLeft(node);
+        if (isRed(node.left) && isRed(node.left.left)) node = rotateRight(node);
+        if (isRed(node.left) && isRed(node.right)) flipColor(node);
+        return node;
     }
 
     public class Blob implements Serializable {
