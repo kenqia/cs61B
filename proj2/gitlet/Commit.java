@@ -95,11 +95,11 @@ public class Commit implements Serializable {
         checkTraceTime(x.getRight(), e);
     }
 
-    public void checkMerge(Branch.SplitPoint point) {
+    public void checkMerge(Commit point) {
         /**先遍历看看Splitpoint的*/
-        this.checkMergeTime(point.getCommit().file.getRoot(), this.getParentMerge());
-        this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.getCommit().file);
-        this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.getCommit().file);
+        this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
+        this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
+        this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);
     }
 
     private void checkmainParent(Blobs.Blob x, Commit secordParent, Blobs point) {
