@@ -27,9 +27,9 @@ public class Branch implements Serializable {
 
 
     public Commit getSplitPoint(Branch given){
-        Commit give = given.HEAD;
         Commit now = this.HEAD;
         while (now != null) {
+            Commit give = given.HEAD;
             while (give != null) {
                 if (give.getHashCode().equals(now.getHashCode())) {
                     return give;

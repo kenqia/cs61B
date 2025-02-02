@@ -45,6 +45,14 @@ public class Stage implements Serializable {
         check(this.size, head[index].size);
     }
 
+    private void addNoCheck(String code, String name) {
+        int index = Math.abs(code.hashCode()) % head.length;
+        node adding = new node(null, code, name);
+        head[index] = addlast(head[index], adding);
+        head[index].size++;
+        if (this.head[index].size == 1) this.size++;
+    }
+
     private node addlast(node head, node hehe) {
         node x = head;
         while (x.next != null) {
@@ -68,7 +76,7 @@ public class Stage implements Serializable {
         for (int i = 0; i < this.head.length; i++) {
             node x = head[i].next;
             while (x != null) {
-                one.add(x.code, x.name);
+                one.addNoCheck(x.code, x.name);
                 x = x.next;
             }
         }

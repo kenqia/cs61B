@@ -253,8 +253,11 @@ public class Main {
                 }
 
                 /** java gitlet.Main checkout [commit id] -- [file name] */
-                else if (args.length == 4 && ( args[2].equals("--") || args[2].equals("++"))) {
+                else if (args.length == 4 &&  args[2].equals("--")) {
                     Repository.checkoutCommit(args[1], args[3]);
+                }
+                else{
+                    System.out.println("Incorrect operands.");
                 }
                 break;
             case "branch":
@@ -268,7 +271,6 @@ public class Main {
                 Branch nowBranch5 = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
                 Branch newBranch = new Branch(args[1], nowBranch5.HEAD);
                 Repository.addBranch(newBranch);
-                Repository.addBranch(nowBranch5);
                 break;
             case "rm-branch":
                 if (args.length != 2) {
@@ -339,6 +341,7 @@ public class Main {
                     /** java gitlet.Main checkout [branch name] */
                     Repository.checkoutBranch(theGivenBranch);
                     System.out.println("Current branch fast-forwarded.");
+                    System.exit(0);
                 }
                 /** 获取 时间数据 */
                 Date dateNow = new Date();
@@ -350,7 +353,8 @@ public class Main {
                 mergeCommit.checkMerge(point);
                 System.out.println("Merged " + theGivenBranch.name + " into " + nowBranch8.name + ".");
                 mergeCommit.loadingCommit();
-
+                Branch nowBranch9 = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
+                Repository.checkoutBranch(nowBranch9);
                 break;
             default:
                 System.out.println("No command with that name exists.");

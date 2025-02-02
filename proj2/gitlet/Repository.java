@@ -61,6 +61,12 @@ public class Repository {
                 System.exit(0);
             }
         }
+        Stage.node e =nowStage.search(name);
+        if(e != null && e.getCode().equals(ZERO)){
+            nowStage.removeStage(name);
+            writeObject(join(Repository.GITLET_DIR, STAGEFILE), nowStage);
+            System.exit(0);
+        }
         /**获取文件 内容 hashcode */
         String contents = readContentsAsString(theFile);
         String hashCode = sha1(contents + name);
@@ -83,7 +89,7 @@ public class Repository {
             }
         }
         /** 更新存储区文件内容 */
-        if (nowStage.isExist(name)) {
+        if (e != null) {
             nowStage.remove(name);
         }
         nowStage.add(hashCode, name);
@@ -94,8 +100,8 @@ public class Repository {
         try {
             if (!join(join(whereAdding, index), hashCode.substring(2)).exists())
                 join(join(whereAdding, index), hashCode.substring(2)).createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException w) {
+            throw new RuntimeException(w);
         }
         writeContents(join(join(whereAdding, index), hashCode.substring(2)), contents);
 
