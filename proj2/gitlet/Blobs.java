@@ -64,10 +64,10 @@ public class Blobs implements Serializable {
         /** 若有相同名字 ， 则覆盖 */
         if (bro != null) {
             if(bro.getHashCode().equals(ZERO)){
-                delete(bro.getName());
+                removeBlob(bro.getName());
                 return;
             }
-            delete(name);
+            removeBlob(name);
             add(code, name, contents);
         } else {
             /** 没有 则添加 */
@@ -104,7 +104,7 @@ public class Blobs implements Serializable {
         return h;
     }
 
-    public void delete(String name) {
+    public void removeBlob(String name) {
         if (!searchExist(name)) {
             System.out.println("String not found");
             return;
@@ -136,14 +136,6 @@ public class Blobs implements Serializable {
                 h.right = delete(h.right, name);
         }
         return balance(h);
-    }
-
-    public void deleteMin() {
-        if (root == null) return;
-        if (!isRed(root.left) && !isRed(root.right))
-            root.color = "RED";
-        root = deleteMin(root);
-        if (root != null) root.color = "BLACK";
     }
 
     private Blob deleteMin(Blob h) {
