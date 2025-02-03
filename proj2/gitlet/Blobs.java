@@ -63,7 +63,7 @@ public class Blobs implements Serializable {
         Blob bro = search(name);
         /** 若有相同名字 ， 则覆盖 */
         if (bro != null) {
-            if(bro.getHashCode().equals(ZERO)){
+            if (code.equals(ZERO)) {
                 removeBlob(bro.getName());
                 return;
             }
@@ -71,22 +71,19 @@ public class Blobs implements Serializable {
             add(code, name, contents);
         } else {
             /** 没有 则添加 */
-            if(code.equals(ZERO)){
-                return;
-            }
             add(code, name, contents);
         }
     }
 
-    public void printInOrder(){
+    public void printInOrder() {
         printInOrderFinding(this.root);
     }
 
-    private void printInOrderFinding(Blob x){
-        if(x == null ) return;
+    private void printInOrderFinding(Blob x) {
+        if (x == null) return;
 
         printInOrderFinding(x.left);
-        System.out.println(x.name + ":" +  x.hashCode);
+        System.out.println(x.name + ":" + x.hashCode);
         printInOrderFinding(x.right);
     }
 
@@ -122,17 +119,16 @@ public class Blobs implements Serializable {
 
     public void add(String code, String name, String contents) {
         if (this.root == null) {
-            this.root = new Blob(code, null, null, "BLACK", name);
+            this.root = new Blob(code, null, null, name);
             savingBlob(root, contents);
         } else this.root = addidk(this.root, code, name, contents);
         if (root != null) {
-            root.color = "BLACK";
         }
     }
 
     private Blob addidk(Blob node, String code, String name, String contents) {
         if (node == null) {
-            Blob sister = new Blob(code, null, null, "RED", name);
+            Blob sister = new Blob(code, null, null, name);
             savingBlob(sister, contents);
             return sister;
         }
@@ -141,132 +137,65 @@ public class Blobs implements Serializable {
         else if (cmp < 0) node.left = addidk(node.left, code, name, contents);
         else return node;
 
-        if (isRed(node.right) && !isRed(node.left)) {
-            node = rotateLeft(node);
-        } else if (isRed(node.left) && isRed(node.left.left)) {
-            node = rotateRight(node);
-        } else if (isRed(node.right) && isRed(node.left)) {
-            node = filpColor(node);
-        }
         return node;
     }
 
-    private Blob rotateLeft(Blob node) {
-        Blob x = node.right;
-        node.right = x.left;
-        x.left = node;
-        x.color = node.color;
-        node.color = "RED";
-        return x;
-    }
-
-    private Blob rotateRight(Blob node) {
-        Blob x = node.left;
-        node.left = x.right;
-        x.right = node;
-        x.color = node.color;
-        node.color = "RED";
-        return x;
-    }
-
-    private Blob filpColor(Blob node) {
-        if (node.color.equals("RED")) node.color = "BLACK";
-        else node.color = "RED";
-        if (node.left != null) node.left.color = "BLACK";
-        if (node.right != null) node.right.color = "BLACK";
-        return node;
-    }
-
-    private void flipColor(Blob node) {
-        if (node.color.equals("RED")) node.color = "BLACK";
-        else node.color = "RED";
-        if (node.left != null) node.left.color = "BLACK";
-        if (node.right != null) node.right.color = "BLACK";
-    }
-
-    private boolean isRed(Blob node) {
-        return node != null && node.color.equals("RED");
-    }
-
-    // Remove a Blob (maintaining LLRB property)
     public void removeBlob(String name) {
-        if (name == null) return;
-        root = removeBlobTime(root, name);
-        if (root != null) root.color = "BLACK";
+        if (root == null) {
+        }
+        else {
+            root = removeBlobTime(this.root, name);
+        }
     }
 
-    private Blob removeBlobTime(Blob node, String name) {
-        if (node == null) return null;
+    private Blob removeBlobTime(Blob x, String name) {
+        if (x == null) return null;
 
-        int cmp = name.compareTo(node.name);
-        if (cmp < 0) {
-            if (!isRed(node.left) && !isRed(node.left.left)) {
-                node = moveRedLeft(node);
-            }
-            node.left = removeBlobTime(node.left, name);
-        } else {
-            if (isRed(node.left)) {
-                node = rotateRight(node);
-            }
-            if (cmp == 0 && node.right == null) {
+        int cmp = name.compareTo(x.name);
+        if (cmp > 0) x.right = removeBlobTime(x.right, name);
+        else if (cmp < 0) x.left = removeBlobTime(x.left, name);
+        else {
+            if (x.left == null && x.right == null) {
                 return null;
-            }
-            if (!isRed(node.right) && !isRed(node.right.left)) {
-                node = moveRedRight(node);
-            }
-            if (cmp == 0) {
-                Blob min = getMin(node.right);
-                node.name = min.name;
-                node.hashCode = min.hashCode;
-                node.right = removeMin(node.right);
+            } else if (x.left != null && x.right != null) {
+                x = deleteTwochildren(x);
             } else {
-                node.right = removeBlobTime(node.right, name);
+                x = deleteOneChildren(x);
             }
         }
-
-        return balance(node);
+        return x;
     }
 
-    private Blob moveRedLeft(Blob node) {
-        flipColor(node);
-        if (isRed(node.right.left)) {
-            node.right = rotateRight(node.right);
-            node = rotateLeft(node);
-            flipColor(node);
+
+    private Blob deleteTwochildren(Blob x) {
+        if (x.left.right != null) {
+            swapBlob(x, x.left.right);
+            if (x.left.right.left != null && x.left.right.right != null) x.left.right = deleteTwochildren(x.left.right);
+            else if (x.left.right.left == null && x.left.right.right == null) x.left.right = null;
+            else {
+                x.left.right = deleteOneChildren(x.left.right);
+            }
+        }else {
+            swapBlob(x, x.left);
+            if(x.left.left != null) x.left = deleteOneChildren(x.left);
+            else x.left = null;
         }
-        return node;
+        return x;
     }
 
-    private Blob moveRedRight(Blob node) {
-        flipColor(node);
-        if (isRed(node.left.left)) {
-            node = rotateRight(node);
-            flipColor(node);
-        }
-        return node;
+    private Blob deleteOneChildren(Blob x) {
+        if (x.left != null) return x.left;
+        return x.right;
     }
 
-    private Blob getMin(Blob node) {
-        while (node.left != null) {
-            node = node.left;
-        }
-        return node;
-    }
+    private void swapBlob(Blob m, Blob n) {
+        String temp = m.hashCode;
+        m.hashCode = n.hashCode;
+        n.hashCode = temp;
 
-    private Blob removeMin(Blob node) {
-        if (node.left == null) return null;
-        if (!isRed(node.left) && !isRed(node.left.left)) {
-            node = moveRedLeft(node);
-        }
-        node.left = removeMin(node.left);
-        return balance(node);
-    }
-
-    private Blob balance(Blob node) {
-        if (isRed(node.right)) node = rotateLeft(node);
-        if (isRed(node.left) && isRed(node.left.left)) node = rotateRight(node);
-        if (isRed(node.left) && isRed(node.right)) flipColor(node);
-        return node;
+        temp = m.name;
+        m.name = n.name;
+        n.name = temp;
     }
 
     public class Blob implements Serializable {
@@ -274,13 +203,11 @@ public class Blobs implements Serializable {
         public Blob right;
         private String hashCode;
         private String name;
-        private String color;
 
-        public Blob(String code, Blob left, Blob right, String color, String name) {
+        public Blob(String code, Blob left, Blob right, String name) {
             this.hashCode = code;
             this.left = left;
             this.right = right;
-            this.color = color;
             this.name = name;
         }
 

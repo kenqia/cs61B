@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 
+import static gitlet.Main.HEADBRANCH;
 import static gitlet.Main.ZERO;
 import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
@@ -15,8 +16,8 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable {
 
     public Metadata metadata;
-    private final Commit parent;
-    private final Commit parentMerge;
+    private Commit parent;
+    private Commit parentMerge;
     private Blobs file;
     private final String hashCode;
     /**
@@ -48,16 +49,17 @@ public class Commit implements Serializable {
         writeObject(join(join(whereCommiting, index), this.hashCode.substring(2)), this);
 
         /** 更改HEADBRANCH 文件信息*/
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
         nowBranch.HEAD = this;
         Repository.addBranch(nowBranch);
-        writeObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), nowBranch);
+        writeObject(join(Repository.GITLET_DIR, HEADBRANCH), nowBranch);
     }
 
     public void checkStage() {
         /** remake and add */
         Stage nowStage = readObject(join(Repository.GITLET_DIR, Main.STAGEFILE), Stage.class);
         this.file = nowStage.check(this.getBlob());
+        this.parent = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class).HEAD;
     }
 
     /**
@@ -79,7 +81,7 @@ public class Commit implements Serializable {
      */
 
     public void checkTrace() {
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
         checkTraceTime(this.getBlob().getRoot(), nowBranch);
     }
 
@@ -109,17 +111,20 @@ public class Commit implements Serializable {
         this.getParentMerge().file.printInOrder();
         System.out.println();
         this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
+        System.out.println("1");
         this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
+        System.out.println("1");
         this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);
     }
 
     private void checkmainParent(Blobs.Blob x, Commit secordParent, Blobs point) {
         if (x == null) return;
-        checkmainParent(x.getLeft(), secordParent, point);
-        checkmainParent(x.getRight(), secordParent, point);
+        checkmainParent(x.left , secordParent, point);
+        checkmainParent(x.right , secordParent, point);
         Blobs.Blob secord = secordParent.file.search(x.getName());
         Blobs.Blob pointt = point.search(x.getName());
-
+        System.out.println();
+        System.out.println(x.getName());
         /**仅在 当前存在的 不变 */
         if (pointt == null && secord == null) {
 
@@ -136,10 +141,13 @@ public class Commit implements Serializable {
 
     private void checksecordParent(Blobs.Blob x, Commit secordParent, Blobs point) {
         if (x == null) return;
-        checkmainParent(x.getLeft(), secordParent, point);
-        checkmainParent(x.getRight(), secordParent, point);
+        checkmainParent(x.left , secordParent, point);
+        checkmainParent(x.right , secordParent, point);
         /**仅在 given存在的 checkout */
+        System.out.println();
+        System.out.println(x.getName());
         if (!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())) {
+            System.out.println("122");
             Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
             this.file.add(x.getHashCode(), x.getName(), Blobs.getContents(x));
         }
@@ -154,7 +162,8 @@ public class Commit implements Serializable {
         Blobs.Blob secord = secordParent.file.search(x.getName());
         /**有可能 分支有 后面两个没有吗？*/
         /** 任何存在于拆分点、当前分支中未修改且给定分支中不存在的文件都应被删除（并且未跟踪）。 */
-
+        System.out.println();
+        System.out.println(x.getName());
         if(x.getHashCode().equals(ZERO)) return;
         if (main != null && secord == null && x.getHashCode().equals(main.getHashCode())) {
             Repository.addRemove(x.getName());
