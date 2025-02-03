@@ -1,3 +1,4 @@
+
 package gitlet;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class Blobs implements Serializable {
         Blob bro = search(name);
         /** 若有相同名字 ， 则覆盖 */
         if (bro != null) {
-            if(bro.getHashCode().equals(ZERO)){
+            if(code.equals(ZERO)){
                 removeBlob(bro.getName());
                 return;
             }
@@ -71,23 +72,9 @@ public class Blobs implements Serializable {
             add(code, name, contents);
         } else {
             /** 没有 则添加 */
-            if(code.equals(ZERO)){
-                return;
-            }
+
             add(code, name, contents);
         }
-    }
-
-    public void printInOrder(){
-        printInOrderFinding(this.root);
-    }
-
-    private void printInOrderFinding(Blob x){
-        if(x == null ) return;
-
-        printInOrderFinding(x.left);
-        System.out.println(x.name + ":" +  x.hashCode);
-        printInOrderFinding(x.right);
     }
 
     public Blob search(String name) {
@@ -167,6 +154,17 @@ public class Blobs implements Serializable {
         x.color = node.color;
         node.color = "RED";
         return x;
+    }
+    public void printInOrder(){
+        printInOrderFinding(this.root);
+    }
+
+    private void printInOrderFinding(Blob x){
+        if(x == null ) return;
+
+        printInOrderFinding(x.left);
+        System.out.println(x.name + ":" +  x.hashCode);
+        printInOrderFinding(x.right);
     }
 
     private Blob filpColor(Blob node) {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 
+import static gitlet.Main.HEADBRANCH;
 import static gitlet.Main.ZERO;
 import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
@@ -15,8 +16,8 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable {
 
     public Metadata metadata;
-    private final Commit parent;
-    private final Commit parentMerge;
+    private Commit parent;
+    private Commit parentMerge;
     private Blobs file;
     private final String hashCode;
     /**
@@ -48,16 +49,17 @@ public class Commit implements Serializable {
         writeObject(join(join(whereCommiting, index), this.hashCode.substring(2)), this);
 
         /** 更改HEADBRANCH 文件信息*/
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
         nowBranch.HEAD = this;
         Repository.addBranch(nowBranch);
-        writeObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), nowBranch);
+        writeObject(join(Repository.GITLET_DIR, HEADBRANCH), nowBranch);
     }
 
     public void checkStage() {
         /** remake and add */
         Stage nowStage = readObject(join(Repository.GITLET_DIR, Main.STAGEFILE), Stage.class);
         this.file = nowStage.check(this.getBlob());
+        this.parent = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class).HEAD;
     }
 
     /**
@@ -79,7 +81,7 @@ public class Commit implements Serializable {
      */
 
     public void checkTrace() {
-        Branch nowBranch = readObject(join(Repository.GITLET_DIR, Main.HEADBRANCH), Branch.class);
+        Branch nowBranch = readObject(join(Repository.GITLET_DIR, HEADBRANCH), Branch.class);
         checkTraceTime(this.getBlob().getRoot(), nowBranch);
     }
 
@@ -97,17 +99,7 @@ public class Commit implements Serializable {
 
     public void checkMerge(Commit point) {
         /**先遍历看看Splitpoint的*/
-        System.out.println(point.getHashCode());
-        point.file.printInOrder();
-        System.out.println();
 
-        System.out.println(this.getParent().getHashCode());
-        this.getParent().file.printInOrder();
-        System.out.println();
-
-        System.out.println(this.getParentMerge().getHashCode());
-        this.getParentMerge().file.printInOrder();
-        System.out.println();
         this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
         this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
         this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);

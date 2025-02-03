@@ -105,7 +105,6 @@ public class Main {
 
                 /** 新Commit 添加stage区数据 */
                 wantToCommit.checkStage();
-
                 wantToCommit.loadingCommit();
                 /**  重置 stage */
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), new Stage(10));
@@ -354,6 +353,7 @@ public class Main {
                 mergeCommit.loadingCommit();
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), new Stage(10));
                 break;
+                
             default:
                 System.out.println("No command with that name exists.");
                 break;
