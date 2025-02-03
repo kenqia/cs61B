@@ -97,6 +97,17 @@ public class Commit implements Serializable {
 
     public void checkMerge(Commit point) {
         /**先遍历看看Splitpoint的*/
+        System.out.println(point.getHashCode());
+        point.file.printInOrder();
+        System.out.println();
+
+        System.out.println(this.getParent().getHashCode());
+        this.getParent().file.printInOrder();
+        System.out.println();
+
+        System.out.println(this.getParentMerge().getHashCode());
+        this.getParentMerge().file.printInOrder();
+        System.out.println();
         this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
         this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
         this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);

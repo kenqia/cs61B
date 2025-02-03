@@ -78,6 +78,18 @@ public class Blobs implements Serializable {
         }
     }
 
+    public void printInOrder(){
+        printInOrderFinding(this.root);
+    }
+
+    private void printInOrderFinding(Blob x){
+        if(x == null ) return;
+
+        printInOrderFinding(x.left);
+        System.out.println(x.name + ":" +  x.hashCode);
+        printInOrderFinding(x.right);
+    }
+
     public Blob search(String name) {
         if (name == null) return null;
         else {
