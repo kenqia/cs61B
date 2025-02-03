@@ -99,21 +99,8 @@ public class Commit implements Serializable {
 
     public void checkMerge(Commit point) {
         /**先遍历看看Splitpoint的*/
-        System.out.println(point.getHashCode());
-        point.file.printInOrder();
-        System.out.println();
-
-        System.out.println(this.getParent().getHashCode());
-        this.getParent().file.printInOrder();
-        System.out.println();
-
-        System.out.println(this.getParentMerge().getHashCode());
-        this.getParentMerge().file.printInOrder();
-        System.out.println();
         this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
-        System.out.println("1");
         this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
-        System.out.println("1");
         this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);
     }
 
@@ -123,8 +110,6 @@ public class Commit implements Serializable {
         checkmainParent(x.right , secordParent, point);
         Blobs.Blob secord = secordParent.file.search(x.getName());
         Blobs.Blob pointt = point.search(x.getName());
-        System.out.println();
-        System.out.println(x.getName());
         /**仅在 当前存在的 不变 */
         if (pointt == null && secord == null) {
 
@@ -144,10 +129,7 @@ public class Commit implements Serializable {
         checkmainParent(x.left , secordParent, point);
         checkmainParent(x.right , secordParent, point);
         /**仅在 given存在的 checkout */
-        System.out.println();
-        System.out.println(x.getName());
         if (!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())) {
-            System.out.println("122");
             Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
             this.file.add(x.getHashCode(), x.getName(), Blobs.getContents(x));
         }
@@ -162,8 +144,6 @@ public class Commit implements Serializable {
         Blobs.Blob secord = secordParent.file.search(x.getName());
         /**有可能 分支有 后面两个没有吗？*/
         /** 任何存在于拆分点、当前分支中未修改且给定分支中不存在的文件都应被删除（并且未跟踪）。 */
-        System.out.println();
-        System.out.println(x.getName());
         if(x.getHashCode().equals(ZERO)) return;
         if (main != null && secord == null && x.getHashCode().equals(main.getHashCode())) {
             Repository.addRemove(x.getName());
