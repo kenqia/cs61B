@@ -347,9 +347,9 @@ public class Main {
                 SimpleDateFormat formatterNow = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z", Locale.ENGLISH);
                 /** 查看HEADBRANCH 复制上一个commit 并且导入时间与message */
                 Blobs h = new Blobs(nowBranch8.HEAD.getBlob().getRoot());
-                Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), ""), nowBranch8.HEAD, theGivenBranch.HEAD, h);
+                String log = ("Merged " + theGivenBranch.name + " into " + nowBranch8.name + ".");
+                Commit mergeCommit = new Commit(new Metadata(formatterNow.format(dateNow), log), nowBranch8.HEAD, theGivenBranch.HEAD, h);
                 mergeCommit.checkMerge(point);
-                System.out.println("Merged " + theGivenBranch.name + " into " + nowBranch8.name + ".");
                 mergeCommit.loadingCommit();
                 writeObject(join(Repository.GITLET_DIR, STAGEFILE), new Stage(10));
                 break;
