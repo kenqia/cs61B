@@ -101,7 +101,7 @@ public class Commit implements Serializable {
         /**先遍历看看Splitpoint的*/
         this.checkMergeTime(point.file.getRoot(), this.getParentMerge());
         this.checkmainParent(this.getParent().file.getRoot(), this.getParentMerge(), point.file);
-        this.checksecordParent(this.getParentMerge().file.getRoot(), this.getParentMerge(), point.file);
+        this.checksecordParent(this.getParentMerge().file.root, this.getParentMerge(), point.file);
     }
 
     private void checkmainParent(Blobs.Blob x, Commit secordParent, Blobs point) {
@@ -116,7 +116,6 @@ public class Commit implements Serializable {
         }
         /** point没有 当前有 given也有 但相同 */
         else if (pointt == null && secord != null && secord.getHashCode().equals(x.getHashCode())) {
-
         }
         /** point没有 当前有 given也有 但不同 */
         else if (pointt == null && secord != null) {
@@ -126,10 +125,12 @@ public class Commit implements Serializable {
 
     private void checksecordParent(Blobs.Blob x, Commit secordParent, Blobs point) {
         if (x == null) return;
-        checkmainParent(x.left , secordParent, point);
-        checkmainParent(x.right , secordParent, point);
+        checksecordParent(x.left , secordParent, point);
+        checksecordParent(x.right , secordParent, point);
+        Blobs.Blob main = parent.file.search(x.getName());
+        Blobs.Blob pointt = point.search(x.getName());
         /**仅在 given存在的 checkout */
-        if (!point.searchExist(x.getName()) && !this.file.searchExist(x.getName())) {
+        if (pointt == null && main == null) {
             Repository.checkoutCommit(secordParent.getHashCode(), x.getName());
             this.file.add(x.getHashCode(), x.getName(), Blobs.getContents(x));
         }
