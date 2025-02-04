@@ -23,7 +23,7 @@ public class Blobs implements Serializable {
 
 
     public static String getContents(Blob x) {
-        if (x == null) return null;
+        if (x == null) return "";
         String code = x.hashCode;
         /** 存储 */
         String index = code.substring(0, 2);
