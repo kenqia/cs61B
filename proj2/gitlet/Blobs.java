@@ -23,8 +23,8 @@ public class Blobs implements Serializable {
 
 
     public static String getContents(Blob x) {
+        if (x == null) return null;
         String code = x.hashCode;
-        if (code.equals(ZERO)) return null;
         /** 存储 */
         String index = code.substring(0, 2);
         File whereSaving = join(Repository.GITLET_DIR, "objects");
@@ -170,7 +170,8 @@ public class Blobs implements Serializable {
     private Blob deleteTwochildren(Blob x) {
         if (x.left.right != null) {
             swapBlob(x, x.left.right);
-            if (x.left.right.left != null && x.left.right.right != null) x.left.right = deleteTwochildren(x.left.right);
+            if (x.left.right.left != null && x.left.right.right != null)
+                x.left.right = deleteTwochildren(x.left.right);
             else if (x.left.right.left == null && x.left.right.right == null) x.left.right = null;
             else {
                 x.left.right = deleteOneChildren(x.left.right);

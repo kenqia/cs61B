@@ -17,7 +17,7 @@ public class Commit implements Serializable {
 
     public Metadata metadata;
     private Commit parent;
-    private Commit parentMerge;
+    private final Commit parentMerge;
     private Blobs file;
     private final String hashCode;
     /**
@@ -115,11 +115,11 @@ public class Commit implements Serializable {
 
         }
         /** point没有 当前有 given也有 但相同 */
-        else if (pointt == null && secord != null && secord.getHashCode().equals(x.getHashCode())) {
+        else if (pointt == null  && secord.getHashCode().equals(x.getHashCode())) {
         }
         /** point没有 当前有 given也有 但不同 */
-        else if (pointt == null && secord != null) {
-            mergeContent(x, x, secord, secordParent);
+        else if (pointt == null ) {
+            mergeContent(x, x, secord);
         }
     }
 
@@ -158,40 +158,34 @@ public class Commit implements Serializable {
 
         }
         /** 当前branch没变 given变了的Blob checkgiven */
-        else if (x.getHashCode().equals(main.getHashCode()) && !x.getHashCode().equals(secord.getHashCode())) {
+        else if (main != null &&x.getHashCode().equals(main.getHashCode()) && secord != null && !x.getHashCode().equals(secord.getHashCode())) {
 
             Repository.checkoutCommit(secordParent.hashCode, x.getName());
             this.file.removeBlob(main.getName());
             this.file.add(secord.getHashCode(), secord.getName(), Blobs.getContents(secord));
         }
         /** 当前branch变了 given没变 check 不变 */
-        else if (!x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())) {
+        else if (main != null && secord!= null && !x.getHashCode().equals(main.getHashCode()) && x.getHashCode().equals(secord.getHashCode())) {
 
         }
         /** 两个文件现在具有相同的内容或都已被删除  不变*/
-        else if (secord.getHashCode().equals(main.getHashCode())) {
+        else if (main != null && secord!= null && secord.getHashCode().equals(main.getHashCode())) {
 
             Repository.checkoutCommit(this.hashCode, x.getName());
         }
         /** 两个文件不同内容 */
         else {
-
-            mergeContent(x, main, secord, secordParent);
+            mergeContent(x, main, secord);
         }
     }
 
-    private void mergeContent(Blobs.Blob x, Blobs.Blob main, Blobs.Blob secord, Commit secordParent) {
+    private void mergeContent(Blobs.Blob x, Blobs.Blob main, Blobs.Blob secord) {
         System.out.println("Encountered a merge conflict.");
-        if (main.getHashCode().equals(ZERO) || secord.getHashCode().equals(ZERO)) {
-            this.file.removeBlob(x.getName());
-            this.file.add(ZERO, x.getName(), "");
-        } else {
             this.file.removeBlob(x.getName());
             String contents = "<<<<<<< HEAD" + "\n" + Blobs.getContents(main) + "\n" + "=======" + "\n" + Blobs.getContents(secord) + "\n" + ">>>>>>>";
             this.file.add(sha1(contents + x.getName()), x.getName(), contents);
-            Repository.checkoutCommit(this.getHashCode(), x.getName());
+            Repository.savingBlobCWD(this.file.search(x.getName()));
         }
-    }
 
     /**
      * 把所有这个commit跟踪的有关文件导入进来

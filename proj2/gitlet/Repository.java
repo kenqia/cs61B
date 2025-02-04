@@ -161,9 +161,11 @@ public class Repository {
     public static boolean searchBranchExist(String name) {
         File whereBranch = join(Repository.GITLET_DIR, "branch");
         String[] branchHere = whereBranch.list();
+        if (branchHere == null) return false;
         for (String item : branchHere) {
             File branchNow = join(whereBranch, item);
             List<String> branch = plainFilenamesIn(branchNow);
+            if (branch == null) return false;
             for (String one : branch) {
                 Branch branchItem = readObject(join(branchNow, one), Branch.class);
                 if (branchItem.name.equals(name)) {
@@ -177,9 +179,11 @@ public class Repository {
     public static Branch searchBranch(String name) {
         File whereBranch = join(Repository.GITLET_DIR, "branch");
         String[] branchHere = whereBranch.list();
+        if (branchHere == null) return null;
         for (String item : branchHere) {
             File branchNow = join(whereBranch, item);
             List<String> branch = plainFilenamesIn(branchNow);
+            if (branch == null) return null;
             for (String one : branch) {
                 Branch branchItem = readObject(join(branchNow, one), Branch.class);
                 if (branchItem.name.equals(name)) {
@@ -193,9 +197,11 @@ public class Repository {
     public static boolean searchCommitExist(String code) {
         File whereCommit = join(Repository.GITLET_DIR, "commits");
         String[] CommitHere = whereCommit.list();
+        if(CommitHere == null) return false;
         for (String item : CommitHere) {
             File commitNow = join(whereCommit, item);
             List<String> commit = plainFilenamesIn(commitNow);
+            if(commit == null) return false;
             for (String one : commit) {
                 Commit commitItem = readObject(join(commitNow, one), Commit.class);
                 if (commitItem.getHashCode().equals(code)) {
@@ -209,9 +215,11 @@ public class Repository {
     public static Commit searchCommit(String code) {
         File whereCommit = join(Repository.GITLET_DIR, "commits");
         String[] CommitHere = whereCommit.list();
+        if(CommitHere == null) return null;
         for (String item : CommitHere) {
             File commitNow = join(whereCommit, item);
             List<String> commit = plainFilenamesIn(commitNow);
+            if(commit == null) return null;
             for (String one : commit) {
                 Commit commitItem = readObject(join(commitNow, one), Commit.class);
                 if (commitItem.getHashCode().equals(code)) {
@@ -223,6 +231,7 @@ public class Repository {
     }
 
     public static void removeBranch(Branch x) {
+        if(x == null) return;
         String hashCode = x.code;
         File whereRemove = join(GITLET_DIR, "branch");
         String index = x.code.substring(0, 2);
@@ -268,10 +277,12 @@ public class Repository {
         }
         File whereBranch = join(Repository.GITLET_DIR, "branch");
         String[] branchHere = whereBranch.list();
+        if (branchHere == null) return;
         for (String item : branchHere) {
             int flag = 0;
             File branchNow = join(whereBranch, item);
             List<String> branch = plainFilenamesIn(branchNow);
+            if (branch == null) return;
             for (String one : branch) {
                 Branch branchItem = readObject(join(branchNow, one), Branch.class);
                 if (branchItem.name.equals(name)) {

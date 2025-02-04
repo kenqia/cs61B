@@ -80,7 +80,7 @@ public class Main {
                     System.out.println("Please enter a commit message.");
                     System.exit(0);
                 }
-                if (args[1].equals("")) {
+                if (args[1].isEmpty()) {
                     System.out.println("Please enter a commit message.");
                     System.exit(0);
                 }
@@ -156,9 +156,11 @@ public class Main {
             case "global-log":
                 File whereCommit = join(Repository.GITLET_DIR, "commits");
                 String[] commitHere = whereCommit.list();
+                if(commitHere == null) System.exit(0);
                 for (String item : commitHere) {
                     File commitNow = join(whereCommit, item);
                     List<String> commit = plainFilenamesIn(commitNow);
+                    if(commit == null) System.exit(0);
                     for (String one : commit) {
                         Commit commitItem = readObject(join(commitNow, one), Commit.class);
                         System.out.println("===");
@@ -179,9 +181,11 @@ public class Main {
                 }
                 File whereCommit1 = join(Repository.GITLET_DIR, "commits");
                 String[] commitHere1 = whereCommit1.list();
+                if(commitHere1 == null) System.exit(0);
                 for (String item : commitHere1) {
                     File commitNow = join(whereCommit1, item);
                     List<String> commit = plainFilenamesIn(commitNow);
+                    if(commit == null) System.exit(0);
                     for (String one : commit) {
                         Commit commitItem = readObject(join(commitNow, one), Commit.class);
                         if (commitItem.metadata.logMessage.equals(args[1])) {
@@ -203,9 +207,11 @@ public class Main {
                 File whereBranch = join(Repository.GITLET_DIR, "branch");
                 String[] branchHere = whereBranch.list();
                 List<String> Branches = new ArrayList<>();
+                if(branchHere == null) System.exit(0);
                 for (String item : branchHere) {
                     File branchNow = join(whereBranch, item);
                     List<String> branch = plainFilenamesIn(branchNow);
+                    if(branch == null) System.exit(0);
                     for (String one : branch) {
                         Branch branchItem = readObject(join(branchNow, one), Branch.class);
                         Branches.add(branchItem.name);
@@ -295,6 +301,7 @@ public class Main {
                     System.exit(0);
                 } else {
                     Commit w = Repository.searchCommit(args[1]);
+                    if(w == null) System.exit(0);
                     w.checkTrace();
                     nowBranch7.HEAD.delete();
                     w.get();
