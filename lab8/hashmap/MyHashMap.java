@@ -7,7 +7,7 @@ import java.util.*;
  *  access to elements via get(), remove(), and put() in the best case.
  *
  *  Assumes null keys will never be inserted, and does not resize down upon remove().
- *  @author YOUR NAME HERE
+ *  kenqia
  */
 public class MyHashMap<K, V> implements Map61B<K, V>{
 
@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
     /* Instance Variables */
     private Collection<Node>[] buckets;
     private int size;   /** Node 的总数 */
-    private double maxLoad = 0.75;   /** Load : N/M ; N : numbers of Nodes ; M numbers of the buckets */
+    private double maxLoad = 0.75;   /** Load : N/M ; N : numbers of Nodes ; M lengths of the buckets */
     // You should probably define some more!
 
     /** Constructors */
@@ -114,6 +114,7 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
     public void clear(){
         this.buckets = createTable(16);
         this.size = 0;
+        this.maxLoad = 0.75;
     }
 
     @Override
@@ -165,12 +166,13 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
         int index = hashfunction(key);
         if(!containsKey(key)) {
             this.buckets[index].add(new Node(key , value));
+            this.size++;
             check();
         }
         else{
             for(Node item : this.buckets[index]){
                 if(item.key.equals(key)){
-                    item.value = value;  /** 遍历的是拷贝还是指针？ */
+                    item.value = value;
                 }
             }
         }
@@ -186,6 +188,7 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
         Collection<Node>[] x;
         x = this.buckets.clone();
         this.buckets = createTable(x.length * 2);
+        this.size = 0;
         for (int i = 0 ; i < x.length ; i++){
             for(Node item : x[i]){
                 put(item.key , item.value);
@@ -197,10 +200,8 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
     /** Returns a Set view of the keys contained in this map. */
     public Set<K> keySet(){
         Set<K> x = new HashSet<>();
-        for (int i = 0 ; i < this.buckets.length ; i++){
-            for(Node item : this.buckets[i]){
-                x.add(item.key);
-            }
+        for(K key : this){
+            x.add(key);
         }
         return x;
     }
@@ -259,7 +260,15 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
      * UnsupportedOperationException.
      */
     public V remove(K key){
-        throw new UnsupportedOperationException();
+        if(!containsKey(key)) return null;
+        int index = hashfunction(key);
+        for(Node x : this.buckets[index]){
+            if(x.key.equals(key)){
+                this.buckets[index].remove(x);
+                return x.value;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -269,6 +278,14 @@ public class MyHashMap<K, V> implements Map61B<K, V>{
      * throw an UnsupportedOperationException.
      */
     public V remove(K key, V value){
-        throw new UnsupportedOperationException();
+        if(!containsKey(key)) return null;
+        int index = hashfunction(key);
+        for(Node x : this.buckets[index]){
+            if(x.key.equals(key) && x.value.equals(value)){
+                this.buckets[index].remove(x);
+                return x.value;
+            }
+        }
+        return null;
     }
 }
